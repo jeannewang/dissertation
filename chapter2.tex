@@ -1,0 +1,73 @@
+\chapter{Background}
+Statistical language models have had much academic and commercial attention in the last \hl{X} years. Academic research has traversed various flavors of language models including n-grams, \hl{blah}. The most notable commercial example of language model usage is Google Translate. 
+
+\section{Language Models}
+\paragraph{}
+A language model is a probabilistic model that computes the conditional probability of an upcoming word given a $m$ word sequence. 
+\begin{align}
+P(w_m | w_1,\dots, w_{m-1})
+\end{align}
+An alternative definition is that a language model computes the joint probability of a particular sequence of  $m$ words. 
+\begin{align}
+P(w_1, \dots ,w_m)
+\end{align}
+In this dissertation I will be using the former definition. Language modeling is generally applied to natural languages such as English, French, Chinese, etc. 
+\paragraph{}
+Statistical language models have benefited greatly with the proliferation and widespread availability of large text corpuses through the internet. 
+\paragraph{}
+
+\section{Language Model Usages}
+\paragraph{}
+Language models are an integral part of many computational linguistic applications most notably speech recognition and machine translation. They have also been important in \hl{IR tasks, etc}. Language models provide a priori knowledge of what a particular language looks like. 
+
+\section{N-gram Models}
+\paragraph{}
+The N-gram model is extremely widely used and forms the basis for more advanced language models. The N-gram model is essentially a look-up table of word co-occurance statistics. Due to its look-up table structure, N-gram models are very bad at generalizing to testing data it has not seen in training data. The N in N-gram comes from the $n$ word context that a N-gram model uses to predict word probabilities. A unigram model will use 0 words for history, a 3-gram model will use 2 words for history, etc. N-gram language models are very effective for similar training and testing sets even though they are very simple. For a long time they were considered state-of-the-art because more complicated models only marginally bested N-gram performance and were much more computationally intensive. \cite{Mikolav2012}. 
+In an N-gram model, the probability of observing a sequence $w_1, \dots, w_m$ is approximated using the Markov assumption as 
+\begin{align}
+P(w_1,\dots,w_m) = \prod^{m}_{i=1} P(w_i|w_1,\dots, w_{i-1}) \approx  \prod^{m}_{i=1} P(w_i | w_{i-(n-1)},\dots, w_{i-1}) 
+\\P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{count(w_{i-(n-1)},\dots,w_{i-1},w_i)}{count(w_{i-(n-1)},\dots,w_{i-1})}
+\end{align}
+\subsection{Markov assumption}
+\paragraph{}
+The Markov assumption used in N-gram models is essentially that instead of using the entire previous history to compute the probability of a word, we can use simply the $n$ previous words. In practice this seems to work well.
+\subsection{Curse of Dimensionality}
+\paragraph{}
+For N-grams the benefit of contexts larger than 5 are largely diminished due to the curse of dimensionality. Unfortunately this means that N-grams cannot express long-distance relationships or dependencies in texts. Data becomes very sparse as we increase the number of dimensions. Even over billions of examples in large corpora, it is extremely rare to see the same long word sequence repeated. If test data sequences are not seen in training data then N-gram models perform extremely poorly. 
+\subsection{Smoothing}
+\paragraph{}
+To deal with unseen word sequences (often due to the curse of dimensionality) smoothing is used with N-gram models. Smoothing "...redistribut[es] probabilities between seen and unseen (zero-frequency) events, by
+exploiting the fact that some estimates, mostly those based on single observations, are greatly over-estimated" \cite{Mikolav2012}[p. 16].
+\subsubsection{Laplacian Smoothing}
+\paragraph{}
+The simplest form of smoothing is Laplacian smoothing also known as add one smoothing. With this type of smoothing, all sequence counts are increased by one. This means that all sequences will have a non zero probability. 
+\begin{align}
+P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{count(w_{i-(n-1)},\dots,w_{i-1},w_i)+1}{count(w_{i-(n-1)},\dots,w_{i-1})+V}
+\end{align}
+where V is the size of the vocabulary. While this does solve the issue of 0-frequency elements, Laplacian smoothing gives very bad estimates. 
+\subsubsection{Advanced Smoothing Techniques}
+\paragraph{}
+Many other smoothing techniques have been applied to N-gram models including: Good-Turing, Katz back-off models, Interpolated models, and modified Kneser-Ney models. Modified Kneser-Ney is generally the preferred method of smoothing. These other smoothing techniques generally use knowledge of rarely seen words to estimate counts of words never seen before. The Good-Turning approach modifies the counts of word sequences to be more similar to other word sequences seen slightly more frequently. The Katz back-off model backs-off to lower order n-gram models for 0-frequency word sequences. Interpolated models interpolate between different order n-gram models. Modified Kneser-Ney smoothing combines back-off smoothing and interpolated models.
+
+\section{Logistic Regression Language Models}
+Logistic Regression Language Models or also known as Maximum Entropy Models (ME) can be thought of neural network models without a hidden layer. They are especially good at taking in many different types of features though these features are often hand selected. For language models, ME models typically use n-grams or skip-grams as features \cite[Mikolav2012].  
+ME models have the form:
+\begin{align}
+P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{e^{\sum_i \lambda_i f_i(w_i | w_{i-(n-1)},\dots, w_{i-1})}}{Z(w_{i-(n-1)},\dots, w_{i-1})}
+\end{align}
+
+%\\Z(w_{i-(n-1)},\dots, w_{i-1}) = \sum_{w_i \in V} e^{\sum_i \lambda_i f_i(w_i | w_{i-(n-1})}},\dots, w_{i-1})}
+
+
+\section{Neural Network Based Models}
+\subsection{Neural Probabailistic Model}
+word vector representation
+
+\subsection{Log Bilinear Model}
+\cite{MnihHinton2007}
+\subsection{Feed Forward and Recurrent Neural Network Models}
+
+\section {Extensions to Language Models}
+\subsection{Phrase-based}
+\subsection{Back-Off Models}
+
