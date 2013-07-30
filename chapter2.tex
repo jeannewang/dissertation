@@ -82,20 +82,23 @@ MaxEnt models can be slow to train and test though due to their soft-max formula
 \section{Neural Network Based Models}
 \paragraph{}
 Neural Network based models represent words as real-valued multidimensional vectors. Neural Networks learn these word representations with the hope that these learned vectors capture non-trivial features of the word such as semantic and syntactical patterns.
+
+The main advantage of NNLMs over n-grams is that history is no longer seen as exact sequence of n - 1 words H, but rather as a projection of H into some lower dimensional space. This reduces number of parameters in the model that have to be trained, resulting in automatic clustering of similar histories. While this might sound the same as the motivation for class based models, the main difference is that NNLMs project all words into the same low dimensional space, and there can be many degrees of similarity between words. (Mikolov 24)
+
 \subsection{Neural Probabilistic Model}
 \paragraph{}
-The first rigorous application of Neural Networks to a statistical language model was done by Yoshua Bengio in 2003 \cite{Bengio2003}, though is explored more in \cite{Collobert2008}, and \cite{HuangEtAl2012} . In Bengio's words, his \emph{neural probabilistic model} (NN), "learn[s] a distributed representation for words which allows each training sentence to inform the model about an exponential number of semantically neighboring sentences" \cite{Bengio2003}[p. 1137] The main benefit of NN models is that these distributed \emph{word feature vectors} \hl{take into account contexts larger than the nearest n-words} and also learn representations that account for semantic and syntactical similarity between words. Similar words should also have similar vector representations at least along some dimensions. These word feature vectors have dimensionality much smaller than the size of the vocabulary, typically between 30 to 100 dimensions. In the NN model, the word representations and the model are learned jointly. The model is trained using sequences of the vector representions that correspond to sentences/sequences of words in the training set. The neural network then learns the probability distribution of the next word given the context features by maximizing the log-likelihood of the the training data. 
+The first rigorous application of Neural Networks to a statistical language model was done by Yoshua Bengio in 2003 \cite{Bengio2003}, though is explored more in \cite{Collobert2008}, and \cite{HuangEtAl2012} . In Bengio's words, his \emph{neural probabilistic model} (NN), "learn[s] a distributed representation for words which allows each training sentence to inform the model about an exponential number of semantically neighboring sentences" \cite{Bengio2003}[p. 1137] The main benefit of NN models is that these distributed \emph{word feature vectors} \hl{take into account contexts larger than the nearest n-words} and also learn representations that account for semantic and syntactical similarity between words. Similar words should also have similar vector representations at least along some dimensions. These word feature vectors have dimensionality much smaller than the size of the vocabulary, typically between 30 to 100 dimensions. In the NN model, the word representations and the model are learned jointly. The model is trained using sequences of the vector representions that correspond to sentences/sequences of words in the training set. The neural network then learns the probability distribution of the next word given the context features by maximizing the log-likelihood of the training data. 
 The NN model is given by:
 
 \begin{align}
-P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = g( i, C(w_{n-1}), \dots, C(w_{t-n+1})
+P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = g\left( i, C(w_{n-1}), \dots, C(w_{t-n+1}) \right)
 \\g(x) = \frac {e^{b+Wx+Utanh(d+Hx)}} {\sum_i e^{b+Wx+Utanh(d+Hx)}}
-\\x=(C(w_{n-1}), \dots, C(w_{t-n+1}))
+\\x=\left(C(w_{n-1}), \dots, C(w_{t-n+1})\right)
 \end{align}
 Where $C$ is a $|V|$ x $m$ matrix that holds the distributed vector representations for each word.  $|V|$ is the size of the vocabulary and $m$ is the number of dimensions of the distributed vector representation. $C(w_{n-1}), \dots, C(w_{t-n+1})$ are contexts with an individual $C$ matrix for each of $n$ context words. $n$ is normally on the order of 2 to 10. The $g$ function is a neural network, either a parameterized feed-forward or recurrent neural network. 
 "The free parameters of the model are the output biases b (with $|V|$ elements), the hidden layer biases $d$ (with $h$ elements), the hidden-to-output weights $U$ (a $|V|$ x $h$ matrix), the word features to output weights $W$ (a $|V|$ x $(n-1)m$ matrix), the hidden layer weights $H$ (a $h$ x $(n-1)m$ matrix), and the word features $C$ (a $|V|$ x $m$ matrix)" \cite{Bengio2003}[pg. 1143].
 \paragraph{}
-The parameters $\theta = (b;d;W;U;H;C)$ are learned using stochastic gradient ascent to maximize the regularized log likelihood. Note that the neural network's last step passes through a non-linear soft-max activation function to produce probabilities (outputs are between 0 and 1, and outputs sum up to 1). Additionally, there is only a $n$ word window before the target word, which does not deal with the potentially longer than $n$ words in the sentence before the target word.
+The parameters $\theta = (b;d;W;U;H;C)$ are learned using stochastic gradient ascent to maximize the regularized log likelihood. Note that the neural network's last step passes through a non-linear \emph{soft-max} activation function to produce probabilities (outputs are between 0 and 1, and outputs sum up to 1). Additionally, there is only a $n$ word window before the target word, which does not deal with the potentially longer than $n$ words in the sentence before the target word.
 \paragraph{}
 The NN model generalizes well since neural networks map similar inputs to similar outputs. Since unknown words that are similar to training words will have similar distributed vector representations, the neural network should also be able to predict the unknown word as having a similar probability to the known words.  Due to this, the NN model performs very well in comparison to other top language models. Bengio's model performed 24\% better in terms of perplexity on the Brown corpus and 8\% better on the AP News corpus compared to a 5-gram Kneser-Ney model.
 \paragraph{}
@@ -103,6 +106,30 @@ Unfortunately, NN models are extremely slow to train and test, again mostly due 
 
 \subsection{Feed Forward and Recurrent Neural Network Models}
 The \emph{feed forward neural network} (FFNN) was originally proposed by Bengio in \cite{Bengio2003} and  a simpler architecture is proposed by Tomas Mikolav in \cite{Mikolov2009}.
+
+
+The FFNN is formulated:
+\begin{align}
+\end{align}
+
+\begin{figure}
+\centering
+\includegraphics{./images/rnn.png}
+\caption{Simple Recurrent Network}
+\label{fig:awesome_image}
+\end{figure}
+\paragraph{}
+
+The RNN is formulated:
+\begin{align}
+s_j(t) = \sigma \left( \sum_i w_i(t) u_{ji} + \sum_l s_l (t-1) w_{jl} \right)
+\\y_k(t) = softmax \left( \sum_j s_j(t) v_{kj} \right)
+\\ \sigma(x) = \frac{1}{1+e^{-x}}
+\\ softmax(x_m) = \frac{e^{x_m} }{ \sum_i e^{x_i} } 
+\end{align}
+Where $w(t)$ is the one-hot word representation, $U$ and $W$ hold the matrix parameters between the input and hidden layer, and $V$ is the matrix holding parameters between the hidden and output layer.
+
+
 \subsection{Log Bilinear Model}
 \cite{MnihHinton2007}
 
