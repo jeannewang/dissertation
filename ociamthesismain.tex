@@ -10,6 +10,7 @@
 \usepackage{graphicx}
 \usepackage [autostyle, english = american]{csquotes}
 \usepackage{soul}
+\usepackage{qtree}
 
 
 %input macros (i.e. write your own macros file called mymacros.tex 
@@ -39,10 +40,10 @@
 \setcounter{tocdepth}{3}
 
 
-\maketitle                  % create a title page from the preamble info
-\include{dedication}        % include a dedication.tex file
-\include{acknowlegements}   % include an acknowledgements.tex file
-\include{abstract}          % include the abstract
+%\maketitle                  % create a title page from the preamble info
+%\include{dedication}        % include a dedication.tex file
+%\include{acknowlegements}   % include an acknowledgements.tex file
+%\include{abstract}          % include the abstract
 
 \begin{romanpages}          % start roman page numbering
 \tableofcontents            % generate and include a table of contents
@@ -52,6 +53,7 @@
 %now include the files of latex for each of the chapters etc
 \include{chapter1}
 \include{chapter2}
+\include{chapter3}
 
 %now enable appendix numbering format and include any appendices
 \appendix
