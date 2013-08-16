@@ -65,9 +65,10 @@ Many other smoothing techniques have been applied to n-gram models including: Go
 \emph{Maximum entropy} models (MaxEnt), also known as multinomial logistic regression models, are essentially linear models used for classification. They are especially good at taking in many different types of features though these features are often hand selected. For language models, MaxEnt models typically use n-grams or skip-grams as features \cite{Mikolov2012}. In an MaxEnt model, each feature gives rise to a constraint that the model must follow. A valid probability distribution produced by an MaxEnt model must conform to all of its constraints. Often there is more than one valid probability distribution, so the distribution with the highest entropy is chosen, generally using a maximum likelihood estimator. The original MaxEnt language model is described in \cite{Rosenfeld1994}.
 MaxEnt models have the form:
 \begin{align}
-P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{e^{\sum_i \lambda_i f_i(w_i | w_{i-(n-1)},\dots, w_{i-1})}}{Z(w_{i-(n-1)},
+&P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{e^{\sum_i \lambda_i f_i(w_i | w_{i-(n-1)},\dots, w_{i-1})}}{Z(w_{i-(n-1)},
 \dots, w_{i-1})} \label{eq:maxent}
-\\Z(w_{i-(n-1)},\dots, w_{i-1}) = \sum_{w_i \in V} e^{\sum_i \lambda_i f_i(w_i | w_{i-(n-1)},\dots, w_{i-1})}
+\\
+&Z(w_{i-(n-1)},\dots, w_{i-1}) = \sum_{w_i \in V} e^{\sum_i \lambda_i f_i(w_i | w_{i-(n-1)},\dots, w_{i-1})} \nonumber
 \end{align}
 In this formulation, $f_i(w_i | w_{i-(n-1)}$ are features, $\lambda_i$ are the weights for those features, and $Z(w_{i-(n-1)},\dots, w_{i-1})$ is a normalizing constant.
 \paragraph{}
@@ -89,8 +90,9 @@ The first rigorous application of Neural Networks to a statistical language mode
 The NPLM model is given by:
 
 \begin{align}
-P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = g(x_i) = \frac {e^{b+Wx_i+Utanh(d+Hx_i)}} {\sum_i e^{b+Wx_i+Utanh(d+Hx_i)}} \label{FFNN}
-\\x_i=\left(C(w_{i-(n-1)}, \dots, C(w_{i-1}) )\right)
+&P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = g(x_i) = \frac {e^{b+Wx_i+Utanh(d+Hx_i)}} {\sum_i e^{b+Wx_i+Utanh(d+Hx_i)}} \label{FFNN}
+\\
+&x_i=\left(C(w_{i-(n-1)}, \dots, C(w_{i-1}) )\right) \nonumber
 \end{align}
 Where $C$ is a $|V|$ x $m$ matrix that holds the distributed vector representations for each word.  $|V|$ is the size of the vocabulary and $m$ is the number of dimensions of the distributed vector representation. $C(w_{n-1}), \dots, C(w_{t-n+1})$ are contexts with an individual $C$ matrix for each of $n$ context words. $n$ is normally on the order of 2 to 10. The $g$ function is a neural network, either a parameterized feed-forward or recurrent neural network. 
 "The free parameters of the model are the output biases b (with $|V|$ elements), the hidden layer biases $d$ (with $h$ elements), the hidden-to-output weights $U$ (a $|V|$ x $h$ matrix), the word features to output weights $W$ (a $|V|$ x $(n-1)m$ matrix), the hidden layer weights $H$ (a $h$ x $(n-1)m$ matrix), and the word features $C$ (a $|V|$ x $m$ matrix)" \cite[pg. 1143]{Bengio2003}.
@@ -122,10 +124,13 @@ The \emph{recurrent neural network model} (RNN) is similar to a FFNN model excep
 
 The RNN model is formulated:
 \begin{align}
-s_j(t) = \sigma \left( \sum_i w_i(t) u_{ji} + \sum_l s_l (t-1) w_{jl} \right)
-\\y_k(t) = softmax \left( \sum_j s_j(t) v_{kj} \right)
-\\ \sigma(x) = \frac{1}{1+e^{-x}}
-\\ softmax(x_m) = \frac{e^{x_m} }{ \sum_i e^{x_i} } 
+&s_j(t) = \sigma \left( \sum_i w_i(t) u_{ji} + \sum_l s_l (t-1) w_{jl} \right)
+\\
+&y_k(t) = softmax \left( \sum_j s_j(t) v_{kj} \right)
+\\ 
+&\sigma(x) = \frac{1}{1+e^{-x}} \nonumber
+\\ 
+&softmax(x_m) = \frac{e^{x_m} }{ \sum_i e^{x_i} }  \nonumber
 \end{align}
 Where $w(t)$ is the one-hot word representation, $U$ and $W$ hold the matrix parameters between the input and hidden layer, and $V$ is the matrix holding parameters between the hidden and output layer. Refer to figure \ref{fig:RNNfigure}.
 
@@ -139,9 +144,10 @@ The \emph{log-bilinear model} (LBL) is simple neural network based model. Unlike
 
 The LBL model is formulated:
 \begin{align}
-P(w_i | w_{i-(n-1)},\dots, w_{i-1})  = \frac{ exp( \hat{r}^T q_{w_i} +b_{w_i}) } { \sum_j exp( \hat{r}^T q_{w_j} +b_{w_j})} \label{eq:LBL}
-\\ \hat{r} = \sum_{i=1}^{n-1} C_i r_{w_i}
-\end{align}
+P(w_i | w_{i-(n-1)},\dots, w_{i-1})  =& \frac{ exp( \hat{r}^T q_{w_i} +b_{w_i}) } { \sum_j exp( \hat{r}^T q_{w_j} +b_{w_j})} \label{eq:LBL}
+\\ 
+\hat{r} =& \sum_{i=1}^{n-1} C_i r_{w_i} \nonumber
+\end{align} 
 Where $r_{w_i}$ is the vector representation for context word $w_i$ and $q_{w_i}$ is the vector representation for the target word $w_i$. $C_i$ is the matrix that corresponds to the interaction between the $i$th context word and the target word. $b_{w_i}$ is a bias term for word $w_i$. $\hat{r}$ can be thought of as a prediction vector for $w_i$. Note that there are separate representations for context words and target words, even if the actual word is the same.
 
 \paragraph{}
@@ -160,14 +166,16 @@ It has been noted that words that are rare in a language may be used quite frequ
 \section {Evaluation of Language Models}
 \paragraph{}
 Given so many different models, we need a way to compare their performance. One standard comparison score is the perplexity of a model. In this dissertation, I will use perplexity to evaluate my model. Note that to compare perplexities, the models must be trained and tested on the same data.
-\subsection{Perplexity}
+\subsection{Perplexity} \label{sec:perplexity}
 \paragraph{}
 \emph{Perplexity} (PP) can be thought of as a measure of how "perplexed" the model is.
 Perplexity is given by:
 \begin{align}
-PP(w_i | h_i)=e^{- \frac{1}{K} \sum_{i=1}^K P(w_i | h_i ) ln( P(w_i | h_i) ) } 
-\\ h_i = ( w_{i-(n-1)},\dots, w_{i-1} )
+PP(w_i | h_i)=e^{- \frac{1}{K} \sum_{i=1}^K ln( P(w_i | h_i) ) } \label{eq:perplexity}
+\\ h_i = ( w_{i-(n-1)},\dots, w_{i-1} ) \nonumber
 \end{align}
+Where $K$ is the number of testing examples. 
+\paragraph{}
 Perplexity is $e$ raised to the average \emph{Shannon entropy} of the probability distribution. Entropy can be thought of as the average number of base $e$ units required to encode the expected value of the information contained in the probability distribution. A better model will be less "perplexed" when it sees new data, and so will have a lower perplexity.  Perplexity is normally calculated with respect to word sequences from a testing set. 
 \paragraph{}
 Perplexity is an intrinsic evaluation metric, that measures the performance of the model alone. Since language models are often used in larger applications such as machine translation, often people care about the end-to-end performance of such an application. Perplexity does not give a measure of end-to-end performance but perplexity improvement does positively correlate to end-to-end improvement \cite{Jurafsky2009}.
