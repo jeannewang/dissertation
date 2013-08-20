@@ -1,8 +1,30 @@
+\documentclass[12pt]{ociamthesis}  % default square logo 
+%\documentclass[12pt,beltcrest]{ociamthesis} % use old belt crest logo
+%\documentclass[12pt,shieldcrest]{ociamthesis} % use older shield crest logo
 
+%load any additional packages
+\usepackage{amssymb}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\usepackage{graphicx}
+\usepackage [autostyle, english = american]{csquotes}
+\usepackage{soul}
+\usepackage{qtree}
+\usepackage{algorithm2e}
+
+
+%input macros (i.e. write your own macros file called mymacros.tex 
+%and uncomment the next line)
+%\include{mymacros}
+\MakeOuterQuote{"}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
 
 \chapter{Proposed Method}
 
-\section{Proposed model}
+\section{Proposed model} \label{sec:proposedModel}
 \paragraph{}
 The hierarchical log bilinear model proposed by Andriy Mnih and Geoffrey Hinton in \cite{MnihHinton2009} is the starting point for my project. Mnih and Hinton make it clear that varying the binary trees used for the hierarchical representation of the vocabulary can make a significant difference in the performance and speed of the model. To be specific, "trees
 that are well-supported by the data and are reasonably well-balanced so that the resulting models
@@ -114,7 +136,7 @@ We can break up equation \ref{eg:gradientDescent} into its constituent gradients
 
 Here are the gradients after every decision $b_j(w_i)$:
 \begin{align}
-\nabla_{b_j} \left( -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2 \right)  = &  \left( P \left(b_j(w_i) = 1 | h \right) - b_j(w_i) \right) +2\mu b_j 
+\nabla_{b_j} \left( -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2 \right)  = &  \left( P \left(b_j(w_i) = 1 | h \right) - b_j(w_i) \right) +2\mu b_j  \label{eq:gradients}
 \\
 \nabla_{q_j} \left( -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2 \right)  = &\left( P \left(b_j(w_i) = 1 | h \right) - b_j(w_i) \right)\hat{r} +2\mu q_j \nonumber
 \\
@@ -174,7 +196,7 @@ We can fill in the equation for perplexity given by equation \ref{eq:perplexity}
 Where $K$ is the number of testing examples. 
 
 
-\section{Tree creation}
+\section{Tree creation} \label{sec:treeCreation}
 \paragraph{}
 The binary tree used in the HLBL model can make a significant difference to the model performance and speed. In this dissertation, I will explore four different types of trees.
 \subsection{Huffman Trees}
@@ -336,7 +358,7 @@ ADAPTIVE:
 \Return T
 \end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm} \label{code:GMM}
 \SetAlgoLined
 GaussianMixtureModel:
 \\
@@ -364,3 +386,12 @@ Gaussian Mixture Model pseudo-code from \cite{Bishop2006}
 \subsubsection{Creation Complexity}
 \paragraph{}
 The creation complexity of a Recursive ADAPTIVE tree is $O ( R \times |V|^2 \times log|V| \times G + R\times M + T)$ where $R$ is the number of iterations it takes the Recursive ADAPTIVE algorithm to converge, $G$ is the number of iterations it takes the Gaussian Mixture Model to converge, $M$ is the complexity for the HLBL model to be trained, and $T$ is the creation complexity of the first tree used by the HLBL model. 
+
+%next line adds the Bibliography to the contents page
+\addcontentsline{toc}{chapter}{References}
+%uncomment next line to change bibliography name to references
+\renewcommand{\bibname}{References}
+\bibliography{refs}        %use a bibtex bibliography file refs.bib
+\bibliographystyle{plain}  %use the plain bibliography style
+
+\end{document}

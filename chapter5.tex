@@ -1,0 +1,103 @@
+\documentclass[12pt]{ociamthesis}  % default square logo 
+%\documentclass[12pt,beltcrest]{ociamthesis} % use old belt crest logo
+%\documentclass[12pt,shieldcrest]{ociamthesis} % use older shield crest logo
+
+%load any additional packages
+\usepackage{amssymb}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\usepackage{graphicx}
+\usepackage [autostyle, english = american]{csquotes}
+\usepackage{soul}
+\usepackage{qtree}
+\usepackage{algorithm2e}
+
+
+%input macros (i.e. write your own macros file called mymacros.tex 
+%and uncomment the next line)
+%\include{mymacros}
+\MakeOuterQuote{"}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+
+\chapter{Account of Work}
+\paragraph{}
+In this chapter I will describe the work carried out in this project. I will first describe engineering tasks undertaken in the course of the project. Secondly, I will define the experiments and state the experimental results. Lastly, I will analyze the results and their implications.
+
+\section{Engineering Details}
+\paragraph{}
+My implementation of the HLBL model is an extension of the C++ LBL implementation by Phil Blunsom, et al. Additionally, I use tree.hh: an STL-like C++ tree library written by Kasper Peeters, and the Boost \cite{BoostSite} and Eigen \cite{eigenweb} libraries. 
+\paragraph{}
+In this section, I will describe in more detail engineering tasks necessary to build the HLBL model, described in section \ref{sec:proposedModel}. These include model initialization, building binary trees, finite gradient checking and also caching of parameters.
+
+\subsection{Model Initialization}
+\paragraph{}
+All of the model parameters ($Q,R,$ and $C_i$ for all contexts) except for the B vector are initialized using Gaussian distributions with mean $0$, and variance $0.1$.
+\subsubsection{B Initialization}
+\paragraph{}
+Intelligent initialization of the bias matrix can significantly improve perplexity measures. The $B$ vector contains a bias for each node in the binary tree.  The $B$ vector should be initialized with the unigram distribution of the training data. As a bias $b_j$ does not directly correlate to an individual word, $b_j$ should be initialized to the sum of the unigram probability of all words in the subtree under node $j$.  Compared to initialization with a Gaussian distribution, there is a $50\times$ improvement in initial perplexity measures. If the model's initial perplexity is lower, then fewer training iterations are generally needed. I also found that a poor initial perplexity can severely negatively affect the perplexity of the fully trained model.
+
+\subsection{Building Trees}
+\paragraph{}
+I have described the algorithms to build specific trees in section \ref{sec:treeCreation}, but here are some general tips for building binary trees. My binary trees are simple integer trees. My trees contain indices into the $Q$ matrix for the internal node values, and indices into the $R$ matrix for the leaf values. The indices into the $R$ matrix are also the word indices. To tell if I am looking at a word, or a node, I simply check if the node is a leaf node or not.  I found building up binary trees for vocabularies to be easier bottom-up than top-down. This is because one can group together "similar" words much more simply by going from the words to the nodes, than the other way around. I also found that the easiest way for me to keep track of indices to the $Q$ matrix was through the tree. Since my $Q$ matrix is initialized with a Gaussian, it makes no difference which $Q$ node is assigned to which $Q$ index. I just assign $Q$ indices sequentially breadth-first though the tree. 
+\paragraph{}
+When reading in trees from binary codes, it is necessary to build the tree top-down. I found it is easiest to add new nodes of the binary tree in as necessary for each successive binary code. If a new code has a branch that does not exist in the tree, I simply add it in as I go along.
+
+\subsubsection{Mixture of Gaussians for ADAPTIVE trees}
+\paragraph{}
+A \emph{Gaussian Mixture Model} (GMM) is used to cluster word representations in the ADAPTIVE and Recursive ADAPTIVE trees described in section \ref{code:GMM}. To initialize the parameters for the GMM, I randomly assign the word representations into two groups, and from there calculate the group means and covariances to initialize $\mu_k$ and $\sigma_k$. The mixing coefficients $\pi_k$ are initialized to the uniform distribution. Also, when calculating the Gaussian, I found it much faster to use diagonalized versions of the covariance matrices. While this does lose some representational power of the covariance matrices, I find the speedup to be worth it. I run each GMM until convergence, or for 10 epochs, whichever is less. If any of the parameters become ill-defined, I simply back off to the previous epoch's values. 
+
+\subsection{Finite Gradient Check}
+\paragraph{}
+A very easy place to mess up the HLBL implementation is in the gradient computation. One easy way to check if the gradients are being calculated correctly is to use a finite gradient check. The finite gradient check uses the mathematical definition of the derivative. I am going to use the central difference definition, though the forward and backward differences can also be used. The derivative is given by:
+\begin{align}
+\frac{d}{d\theta} J(\theta) = \lim_{\epsilon \to 0} \frac{ J({\theta + \epsilon} )- J({\theta - \epsilon}) } {2 \epsilon}
+\end{align}
+We see that the derivative is given in the limit of $\epsilon \to 0$, therefore if we set $\epsilon$ to a small number ($\approx10^4$), we can approximate the derivative of the objective function. The finite gradient check can then be compared with the gradients calculated from equations \ref{eq:gradients} on the training data.The finite gradient check is very computationally slow, and so should only be used as a check and not as the final gradient computation.
+
+\subsection{Caching}
+\paragraph{}
+Certain variables can be cached as they are reused to calculate different parts of the objective function, gradients and perplexity. It is important to cache these values as it can significantly reduce the training time by avoiding recomputing computationally-expensive values. The values that should be cached include: $\hat{r}$, and $C_i^T q_j$. $\hat{r}$ is particularly important to cache as it is used in the calculation of the objective function, all of the gradients, and the perplexity. Note that a separate $\hat{r}$ should be cached for training versus testing data.
+
+\section{Experiments}
+\paragraph{}
+I have conducted experiments to show the performance and speed of the HLBL model with various trees.
+
+\subsection{Dataset}
+\paragraph{}
+For all of my experiments, I use the Penn Treebank dataset. Specifically, I use the Wall Street Journal sections 2-21 for my training set and section 22 for my testing set. There are 950028 training tokens and 40117 testing tokens. The training set has been pre-processed to replace any word that occurs less than 6 times with "UNK". This reduces the vocabulary to 10531 words. The testing set has also been preprocessed to replace any word not seen in the training set with "UNK".
+
+\subsection{Varying Trees}
+\subsubsection{Random Trees}
+\subsubsection{Huffman Trees}
+\subsubsection{Brown Cluster Trees}
+\subsubsection{Adaptive Random Trees}
+\subsubsection{Adaptive Other Trees}
+
+\subsection{Large Vocabulary}
+
+\section{Experimental Results}
+\subsection{Binary Tree Performance by Length and Time}
+\subsection{Recursive Adaptive Trees}
+\subsection{Varying Representation Dimensionality}
+\subsection{Large Vocabulary}
+
+\subsection{Comparison Against Other Models}
+
+\section{Analysis}
+\paragraph{}
+\subsection{Visualization}
+\subsubsection{TSNE}
+\subsubsection{Matrix Visualization}
+
+
+%next line adds the Bibliography to the contents page
+\addcontentsline{toc}{chapter}{References}
+%uncomment next line to change bibliography name to references
+\renewcommand{\bibname}{References}
+\bibliography{refs}        %use a bibtex bibliography file refs.bib
+\bibliographystyle{plain}  %use the plain bibliography style
+
+\end{document}
