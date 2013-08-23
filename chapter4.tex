@@ -385,7 +385,7 @@ Gaussian Mixture Model pseudo-code from \cite{Bishop2006}
 
 \subsubsection{Creation Complexity}
 \paragraph{}
-The creation complexity of a Recursive ADAPTIVE tree is $O ( R \times |V|^2 \times log|V| \times G + R\times M + T)$ where $R$ is the number of iterations it takes the Recursive ADAPTIVE algorithm to converge, $G$ is the number of iterations it takes the Gaussian Mixture Model to converge, $M$ is the complexity for the HLBL model to be trained, and $T$ is the creation complexity of the first tree used by the HLBL model. 
+The creation complexity of a Recursive ADAPTIVE tree is $O ( |V| \times log|V| \times G + (R-1)\times M + (R-1)\times T)$ where $R$ is the number of iterations it takes the Recursive ADAPTIVE algorithm to converge, $G$ is the number of iterations it takes the Gaussian Mixture Model to converge, $M$ is the maximum training complexity of one of the previous recursive HLBL models, and $T$ is the maximum creation complexity of one of the trees used by the recursive HLBL models. 
 
 %next line adds the Bibliography to the contents page
 \addcontentsline{toc}{chapter}{References}
