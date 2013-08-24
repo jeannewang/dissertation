@@ -1,26 +1,4 @@
-\documentclass[12pt]{ociamthesis}  % default square logo 
-%\documentclass[12pt,beltcrest]{ociamthesis} % use old belt crest logo
-%\documentclass[12pt,shieldcrest]{ociamthesis} % use older shield crest logo
 
-%load any additional packages
-\usepackage{amssymb}
-\usepackage[margin=1in]{geometry} 
-\usepackage{amsmath,amsthm,amssymb}
-\usepackage{listings}% http://ctan.org/pkg/listings
-\usepackage{graphicx}
-\usepackage [autostyle, english = american]{csquotes}
-\usepackage{soul}
-\usepackage{qtree}
-\usepackage{algorithm2e}
-
-
-%input macros (i.e. write your own macros file called mymacros.tex 
-%and uncomment the next line)
-%\include{mymacros}
-\MakeOuterQuote{"}
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
-\begin{document}
 
 \chapter{Proposed Method}
 
@@ -299,20 +277,6 @@ merge two clusters $c_a$ and $c_b$ such that Quality(C) is maximized
 \paragraph{}
 Calculation of the original Brown clusters takes $O(|V|^5)$ calculations and Brown-Liang clusters requires $O(|V| m^2+n|)$ calculations. $m$ is the number of initial clusters and $n$ is the corpus length.  
 
-\subsection{Overcomplete Trees}
-\paragraph{}
-An idea introduced by Mnih and Hinton in \cite{MnihHinton2009} is the use of overcomplete trees. An overcomplete tree is simply the concatenation of $F$ full vocabulary trees. The trees are connected by a new node at the root; the vocabulary trees become subtrees of the new root. 
-\paragraph{}
-Overcomplete trees are a good idea because they allow the HLBL model to take advantage of multiple representations for each word. It may be that certain words should have multiple representations such as polysemous words, or it could be that certain trees are better for representing a word. By using overcomplete trees, the HLBL model is allowed the freedom to choose between the varying code representations while only adding $log_2(F)$ more levels to the tree.
-\paragraph{}
-In \cite{MnihHinton2009}, only overcomplete trees with $ADAPTIVE(\epsilon)$ subtrees are used. I would like to see how using other types of subtrees can affect the performance of overcomplete trees. I will look at $2\times$ overcomplete trees, where there are two subtrees. While many combinations are possible, I will focus on looking at random and random overcomplete trees, random and Huffman overcomplete trees, Huffman and Brown cluster overcomplete trees, and also Huffman and reduced Huffman overcomplete trees. 
-\paragraph{}
-My idea for a reduced Huffman tree is to create a tree of less frequent words. Since the Huffman tree already orders words by frequency, if I simply cut the tree at some depth $d$, all nodes below depth $d$ should contain words that are infrequent, with larger $d$ being more infrequent words. After cutting the tree, the nodes can be reformed into a tree using the normal Huffman code algorithm. Using reduced Huffman trees in overcomplete trees will give less frequent words more code representations, and hopefully will result in better accuracy for less frequent words.
-
-\subsubsection{Creation Complexity}
-\paragraph{}
-The creation complexity of overcomplete trees is simply the summation of the creation complexities of each subtree.
-
 \subsection{Recursive ADAPTIVE Trees}
 \paragraph{}
 Another tree introduced in \cite{MnihHinton2009} is the ADAPTIVE tree. The ADAPTIVE tree is also mentioned in section \ref{sec:HLBL}. The ADAPTIVE tree is created top-down by clustering on learned word representations. The clustering method is a mixture of two Gaussians. The clusters are created with respect to the most responsible Gaussian, which generally creates a non-balanced tree. The real power behind this method comes from the learned word representations which are better than unigram or co-occurance statistics that inform Huffman and Brown cluster trees. The ADAPTIVE tree is in tune with the model, and creates decision nodes that are easy to navigate for the model. 
@@ -387,11 +351,3 @@ Gaussian Mixture Model pseudo-code from \cite{Bishop2006}
 \paragraph{}
 The creation complexity of a Recursive ADAPTIVE tree is $O ( |V| \times log|V| \times G + (R-1)\times M + (R-1)\times T)$ where $R$ is the number of iterations it takes the Recursive ADAPTIVE algorithm to converge, $G$ is the number of iterations it takes the Gaussian Mixture Model to converge, $M$ is the maximum training complexity of one of the previous recursive HLBL models, and $T$ is the maximum creation complexity of one of the trees used by the recursive HLBL models. 
 
-%next line adds the Bibliography to the contents page
-\addcontentsline{toc}{chapter}{References}
-%uncomment next line to change bibliography name to references
-\renewcommand{\bibname}{References}
-\bibliography{refs}        %use a bibtex bibliography file refs.bib
-\bibliographystyle{plain}  %use the plain bibliography style
-
-\end{document}

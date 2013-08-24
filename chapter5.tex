@@ -1,33 +1,3 @@
-\documentclass[12pt]{ociamthesis}  % default square logo 
-%\documentclass[12pt,beltcrest]{ociamthesis} % use old belt crest logo
-%\documentclass[12pt,shieldcrest]{ociamthesis} % use older shield crest logo
-
-%load any additional packages
-\usepackage{amssymb}
-\usepackage[margin=1in]{geometry} 
-\usepackage{amsmath,amsthm,amssymb}
-\usepackage{listings}% http://ctan.org/pkg/listings
-\usepackage{graphicx}
-\usepackage [autostyle, english = american]{csquotes}
-\usepackage{soul}
-\usepackage{qtree}
-\usepackage{algorithm2e}
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{hyperref}
-
-%input macros (i.e. write your own macros file called mymacros.tex 
-%and uncomment the next line)
-%\include{mymacros}
-\MakeOuterQuote{"}
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
-\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
-\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-
-\begin{document}
 
 \chapter{Account of Work}
 \paragraph{}
@@ -62,7 +32,7 @@ A very easy place to mess up the HLBL implementation is in the gradient computat
 \begin{align}
 \frac{d}{d\theta} J(\theta) = \lim_{\epsilon \to 0} \frac{ J({\theta + \epsilon} )- J({\theta - \epsilon}) } {2 \epsilon}
 \end{align}
-We see that the derivative is given in the limit of $\epsilon \to 0$, therefore if we set $\epsilon$ to a small number ($\approx10^4$), we can approximate the derivative of the objective function. The finite gradient check can then be compared with the gradients calculated from equations \ref{eq:gradients} on the training data.The finite gradient check is very computationally slow, and so should only be used as a check and not as the final gradient computation.
+We see that the derivative is given in the limit of $\epsilon \to 0$, therefore if we set $\epsilon$ to a small number ($\approx10^4$), we can approximate the derivative of the objective function. The finite gradient check can then be compared with the gradients calculated from equations \ref{eq:gradients} on the training data. The finite gradient check is very computationally slow, and so should only be used as a check and not as the final gradient computation.
 
 \subsection{Caching}
 \paragraph{}
@@ -70,16 +40,19 @@ Certain variables should be cached as they are used multiples times while calcul
 
 \section{Experiments} \label{sec:experiments}
 \paragraph{}
-I have conducted experiments to show the performance and speed of the HLBL model with various trees. For all of the models, I tried to use similar parameter values. I used a word and node representation size of $100$ dimensions, a $5$-word context (including the target word), a mini batch size of $10,000$ and a learning step-size of $0.01$. I also used a small regularization constant while training all of the models. The models were all trained on the same machine using a single thread. The machine runs at 3.47GHz and has 60GB of RAM.
+I have conducted experiments to show the performance and speed of the HLBL model with various trees. For all of the models, I tried to use similar parameter values for comparison's sake. I used a word and node representation size of $100$ dimensions, a $5$-word context (including the target word), a mini batch size of $10,000$ and a learning step-size of $0.01$. I also used a small regularization constant while training all of the models. Most of the models could actually be learned faster if the parameters were tuned to the individual model. The models were all trained on the same machine using a single thread. The machine runs at 3.47GHz and has 60GB of RAM.
 
 \subsection{Datasets}
 \paragraph{}
-For all of my experiments, I use the Penn Treebank dataset. Specifically, I use the Wall Street Journal (WSJ) sections 2-21 for my training set and section 22 for my testing set. There are 950028 training tokens and 40117 testing tokens. The training set has been pre-processed to replace any word that occurs less than 6 times with "\_UNK\_". This reduces the vocabulary to 10531 words. The testing set has also been preprocessed to replace any word not seen in the training set with "\_UNK\_".
+For most of my experiments, I use the Penn Treebank dataset. Specifically, I use the Wall Street Journal (WSJ) sections 2-21 for my training set and section 22 for my testing set. There are 950028 training tokens and 40117 testing tokens. The training set has been pre-processed to replace any word that occurs less than 6 times with "\_UNK\_". This reduces the vocabulary to 10531 words. The testing set has also been preprocessed to replace any word not seen in the training set with "\_UNK\_".
 \subsubsection{Large Vocabulary}
 \paragraph{}
-Real languages have much larger vocabularies than the WSJ dataset. The Oxford English Dictionary currently has 171,476 full word entries \cite{OED}. For a morphologically rich language, the vocabulary size can easily exceed that of English.
+Real languages have much larger vocabularies than the WSJ dataset. The Oxford English Dictionary currently has 171,476 full word entries for English \cite{OED}. For a morphologically rich language, the vocabulary size can easily exceed that of English.
 \paragraph{}
-The HLBL model really shines in terms of speed with very large vocabulary sizes. The speedup using the HLBL model is order $O(\frac{|V|}{log|V|})$. To highlight this, I also run some experiments where I use the WSJ sections 2-21, with words that occur only once preprocessed out, as a training set. This set has a vocabulary size of 23768. We can see even on a 20k word vocabulary where other speed-up methods start to fail.
+The HLBL model really shines in terms of speed with very large vocabulary sizes. The speedup using the HLBL model is order $O(\frac{|V|}{log|V|})$. To highlight this, I also run some experiments where I use a subset of the British National Corpus (BNC). I use the first 140,000 lines of the BNC, where 100,000 lines are randomly assigned to the training set and the other 40,000 lines are assigned to the test set. There are 2141639 training tokens and 902069 testing tokens. The training set has a vocabulary size of 84439 (including "\_UNK\_").The test set is preprocessed to replace any word not seen in the training set with "\_UNK\_". We can see on the 85K word vocabulary where non-HLBL models slow down immensely.
+
+
+%WSJ sections 2-21, with words that occur only once preprocessed out, as a training set. This set has a vocabulary size of 23768. 
 
 %\subsection{Varying Trees}
 %I use random Trees, Huffman trees, Brown Cluster trees, ADAPTIVE trees, and Recursive Adaptive Trees with the HLBL model.
@@ -90,9 +63,10 @@ In this section I will briefly describe the experiment and its aims, then displa
 
 \subsection{Binary Tree Performance by Length and Time}
 \paragraph{}
-The creation of the trees used in the HLBL model can be done completely separately from the model. We can look at the trees themselves and see if any of their traits contribute to their performance within the HLBL model.  In table \ref{tab:trees}, we can see the creation data for the trees. 
+The creation of the trees used in the HLBL model can be done completely separately from the model. We can look at the trees themselves and see if any of their traits contribute to their performance within the HLBL model.  In table \ref{tab:trees}, we can see the tree creation statistics. I will not describe tree $T_6$ in this section, as the tree is described in section \ref{sec:ADAPTIVEQ}.
+ 
 \paragraph{}
-The average code length gives us the average number of decisions that must be made per word. The training time is linear in the average code length. As we can see, the Huffman tree has the shortest average length, which is expected. But, surprisingly, the Recursive ADAPTIVE(2,Huffman) tree has a much larger average length. Hopefully this implies that the ADAPTIVE(2,Huffman) tree is giving up short codes for the addition of more useful decision nodes. If we delve further into the code lengths, we can see how various code lengths affect the test word perplexities. In table \ref{tab:perplexityCodeLength}, we can see the breakdown of average word perplexities of words with code length $n$ for each tree. The breakdown follows the intuition that longer codes will have worse perplexities. This is due to the increased number of decisions that must be made correctly as the code gets longer. The random tree does not stay true to this intuition, though this is perhaps because of the random tree's tendency to have subtrees that look left-deep or right-deep , whereas the other trees tend to be bushy. Figure \ref{fig:deepvsbushytrees} gives an example of left-deep, right-deep and bushy trees. The left-deep or right-deep trees have a much higher probability of going one direction than the other, so long codes may still have high probabilities. 
+The average code length gives us the average number of decisions that must be made per word. The training time is linear in the average code length. As we can see, the Huffman tree has the shortest average length, which is expected. But, surprisingly, the Recursive ADAPTIVE(2,Huffman) tree has a much larger average length. Hopefully this implies that the ADAPTIVE(2,Huffman) tree is giving up short codes for the addition of more useful decision nodes. If we delve further into the code lengths, we can see how various code lengths affect the test word perplexities. In table \ref{tab:perplexityCodeLength}, we can see the breakdown of average word perplexities, of words with code length $n$, for each tree. The breakdown follows the intuition that longer codes will have worse perplexities. This is due to the increased number of decisions that must be made correctly as the code gets longer. The random tree does not stay true to this intuition, though this is perhaps because of the random tree's tendency to have subtrees that look left-deep or right-deep , whereas the other trees tend to be bushy. Figure \ref{fig:deepvsbushytrees} gives an example of left-deep, right-deep and bushy trees. The left-deep or right-deep trees have a much higher probability of going one direction than the other, so long codes may still have high probabilities. 
 
 \begin{figure}\centering
 \begin{tabular}{ccc}
@@ -103,11 +77,11 @@ The average code length gives us the average number of decisions that must be ma
 \caption{Left-deep, Bushy, and Right-deep trees}
 \label{fig:deepvsbushytrees}
 \end{figure}
-
+f
 \paragraph{}
-All of the trees have as many or almost as many internal nodes as words, meaning we have relatively full trees. The fullness of the trees means that there are not wasted internal nodes that are not on the path to a word. Note that fullness is not the same as bushiness. The amount of bushiness accounts for the discrepancies in the average code length. The training time is also linear in the number of non-leaf nodes, as they correlate directly to the $R$ matrix.
+All of the trees have as many or almost as many internal nodes as words, meaning we have relatively full trees. A full tree is a tree in which every node, excluding leaf nodes, has two children. The fullness of the trees means that there are not wasted internal nodes that are not on the path to a word. Note that fullness is not the same as bushiness. The varying shapes of the trees (bushiness) accounts for the discrepancies in the average code length. The training time is also linear in the number of non-leaf nodes, as they correlate directly to the $R$ matrix.
 \paragraph{}
-We see the greatest differences in the trees in the time it takes to build them. As the random tree only needs the vocabulary to be built, its build time has order $O(|V|)$.The random tree takes longer to build than the Huffman tree, which has creation time order $O(|V|\times log|V)|$, due to poor handling of random nodes in my code. Random trees should theoretically have the fastest creation times. The Brown Clustering tree is by far the most time intensive tree to build. The Brown Clustering tree takes order $O(|V|^3+n|)$, where $n$ is the corpus length. It is slower to build than the Recursive ADAPTIVE($r,t$) trees which requires $r-1$ trees and $r-1$ models to be built and trained. The Recursive ADAPTIVE($r,t$) tree has creation order $O ( |V| \times log|V| \times g + (r-1)\times m + (r-1)\times t)$ where $g$ is the number of iterations it takes the Gaussian Mixture Model to converge, and $m$ is the maximum training complexity of one of the previous recursive HLBL models.
+We see the greatest differences in the trees in the time it takes to build them. The random tree only depends on the vocabulary so its build time has order $O(|V|)$. Oddly, in table \ref{tab:trees}, the random tree takes longer to build than the Huffman tree. The Huffman tree has creation order $O(|V|\times log|V)|$ and should be slower to build than the random tree.  The discrepancy is due to poor handling of random nodes in my code causing random trees to be built slowly. The Brown Clustering tree is by far the most time intensive tree to build. The Brown Clustering tree takes order $O(|V|^3+n|)$, where $n$ is the corpus length. It is slower to build than the Recursive ADAPTIVE($r,t$) trees which requires $r-1$ trees and $r-1$ models to be built and trained. The Recursive ADAPTIVE($r,t$) tree has creation order $O ( |V| \times log|V| \times g + (r-1)\times m + (r-1)\times t)$ where $g$ is the number of iterations it takes the Gaussian Mixture Model to converge, and $m$ is the maximum training complexity of one of the previous recursive HLBL models.
 
 \begin{table*} \centering
 \ra{1.3}
@@ -119,9 +93,10 @@ $T_2$ & Huffman & 26.257 & 10530 & 0.1s\\
 $T_3$ & Brown Cluster & 28.388 & 10528 &271600.39s \\
 $T_4$ & Recursive ADAPTIVE (3,Random)& 28.218 & 10531 &16735.63s \\
 $T_5$ & Recursive ADAPTIVE (2,Huffman)& 32.254 & 10531 &10514.82s\\
+$T_6$ & ADAPTIVE(word2vec) & 25.82& 10530& 2067.53s\\
 \bottomrule
 \end{tabular}
-\caption{Trees for HLBL model. Recursive ADAPTIVE $(n,tree)$ means it was an ADAPTIVE tree recursively run $n$ times and with an initial HLBL model using $tree$.}
+\caption{Trees for HLBL model. Recursive ADAPTIVE $(n,tree)$ means it was an ADAPTIVE tree recursively run $n$ times and with an initial HLBL model using $tree$. The ADAPTIVE($x$) tree is an ADAPTIVE tree that was built by clustering together $x$ representations.}
 \label{tab:trees}
 \end{table*}
 
@@ -168,7 +143,7 @@ Code Length & $T_1$ & $T_2$ & $T_3$ & $T_4$ & $T_5$ \\ \midrule
 
 \subsection{Recursive Adaptive Trees}
 \paragraph{}
-I ran an experiment to see how many levels of recursion for the Recursive Adaptive Trees was optimal. The results for the Recursive Adaptive tree with an initial random tree are in table \ref{tab:recursiveAdaptive}. The best level of recursion was 3 with the initial random tree. It is interesting to look at the code length as the number of recursion levels go up. We see that initially, the tree has a very low code length, but the average tree length jumps up sharply, on the next iteration. This correlates to a sharp drop in perplexity also. I imagine the tree must be reorganizing itself with more internal nodes that help make more natural decisions in recursion level 2. We see that after this level, the average tree length starts going down again. I assume this means the opposite trade-off is now happening, in return for fewer decisions overall, the tree gets rid of potentially useful decision nodes. I also ran the same experiment with an initial Huffman tree and Brown Cluster tree. The Recursive ADAPTIVE Huffman tree's best perplexity was on recursion level 2. The Brown Cluster on the hand did not perform better with any level of recursion. I think this implies that the Brown Clustering already has good decision nodes, and that reorganizing the tree actually detracts from the original decision nodes.
+I ran an experiment to see how many levels of recursion for the Recursive Adaptive Trees was optimal. The results for the Recursive Adaptive tree with an initial random tree are in table \ref{tab:recursiveAdaptive}. The best level of recursion was 3 with the initial random tree. It is interesting to look at the code length as the number of recursion levels go up. We see that initially, the tree has a very low code length, but the average tree length jumps up sharply, on the next iteration. This correlates to a sharp drop in perplexity. I imagine the tree must be reorganizing itself with more internal nodes to help make more natural decisions. We see that after recursion level 2, the average tree length starts going down again. I assume this means the opposite trade-off is now happening, in return for fewer decisions overall, the tree gets rid of potentially useful decision nodes. I also ran the same experiment with an initial Huffman tree and an initial Brown Cluster tree. The Recursive ADAPTIVE Huffman tree's best perplexity was on recursion level 2. The Brown Cluster on the hand did not perform better with any level of recursion. I think this implies that the Brown Clustering already has good decision nodes (and good clusters), and that reorganizing the tree actually detracts from the original decision nodes.
 \begin{table*} \centering
 \ra{1.3}
 \begin{tabular}{@{}cccc@{}}\toprule
@@ -187,7 +162,7 @@ $5$ & 109.577 & 25.39\\
 
 \subsection{Varying Representation Dimensionality}
 \paragraph{}
-The expressivity of the model directly depends on the representation dimensionality. As the size of the vocabulary and training set grows, the expressivity of the model should also grow in order to capture the additional information given by new word combinations and patterns. Mnih and Hinton in \cite{MnihHinton2009} explore varying representation dimensionalities under 100 dimensions. They found that larger dimensions afford better models in terms performance. Mnih and Hinton concluded that 100 dimensions was enough to capture the complexities of the APNews dataset's 17964K vocabulary. I looked at representation dimensionalities larger than 100, and found that larger word representations for the HLBL model on the WSJ dataset can still help the model performance. The results can be found in table \ref{tab:wordRepSize}. Simply by increasing the representation size, even for the HLBL model with a random tree, we can see an increase in performance. The increases seem to be tailing off around 300 dimensions though. Unfortunately, larger representation sizes also directly contribute to training and testing speed, so for the rest of my experiments I left the representation size at 100 dimensions. The HLBL model might need larger representation sizes than the standard LBL model, as the node representations may need to be larger to capture the complexities of the decision tree.
+The expressivity of the model directly depends on the representation dimensionality. As the size of the vocabulary and training set grows, the expressivity of the model should also grow in order to capture the additional information given by new word combinations and patterns. Mnih and Hinton in \cite{MnihHinton2009} explore varying representation dimensionalities under 100 dimensions. They found that larger dimensions afford better model performance. Mnih and Hinton concluded that 100 dimensions was enough to capture the complexities of the APNews dataset's 17964K vocabulary. I looked at representation dimensionalities larger than 100, and found that larger word representations for the HLBL model trained on the WSJ dataset helped the model performance. The results can be found in table \ref{tab:wordRepSize}. Simply by increasing the representation size, even for the HLBL model with a random tree, we can see an increase in performance. The increases seem to be tailing off around 300 dimensions.  The HLBL model might need larger representation sizes than the standard LBL model, as the node representations may need to be larger to capture the complexities of the decision tree.
 
 
 \begin{table*} \centering
@@ -211,9 +186,7 @@ $300$ & 111.102 \\
 I also compared the HLBL model run with the various trees from table \ref{tab:trees} to other language models. All of the HLBL models had the same parameters as described in section \ref{sec:experiments}. The LBL and Factored LBL models were implemented by Phil Blunsom, et al. The factored LBL model is the frequency binned model described in section \ref{sec:frequencybinning}. The model uses 100 frequency classes. The 5-gram with modified Kneser Ney smoothing was run using the SRILM implementation \cite{Alumae2010}. The models were allowed to run until their test perplexities stopped decreasing. The results are given by table \ref{tab:languageModelComparison}. The reduction in perplexities and entropy is given by table \ref{tab:reductionPerplexity}. 
 
 \paragraph{}
-All of the HLBL models, including using a random tree, perform better than the 5-gram Kneser Ney model,  so we see that even simple neural models are more expressive than co-occurence statistics. The best proposed HLBL model uses a Brown Cluster tree. The HLBL model with a Brown Cluster tree has a 17.24\% reduction in perplexity and a 3.93\% reduction in entropy over the 5-gram model and is not that much worse in terms of performance than the LBL model. However, creating the Brown Cluster tree is incredibly slow, and overall the total time for the model is $58\times$ slower than the LBL model. While the Brown Cluster tree performs as well as any other tree in terms of training time per epoch and testing time, the tree creation time is extremely high. As the overall purpose of this project is to find a tree that is both fast and performs reasonably, the Brown Cluster tree, sadly, does not cut it. Probably the best tree given these criteria, is the Huffman tree. The HLBL model with the Huffman tree is $2.32\times$ faster than the LBL model but 16.19\% worse in terms of perplexity and is 3.71\% worse in terms of entropy. Still, this can be a small price to pay when it comes to very large corpora with hundreds of thousands of words in their vocabulary for a $O(\frac{|V|}{log|V|})$ speed-up even with tree creation time accounted for as we can see in table \ref{tab:largeVocabulary}. The last two HLBL models use the Recursive ADAPTIVE algorithm. The Recursive ADAPIVE algorithm essentially creates Brown Cluster like trees given existing representations. The resultant trees have semantically/syntactically similar words close together in the tree. At least on a vocabulary of 10K, the Recursive ADAPTIVE algorithm is faster than the Brown Clustering algorithm at creating trees. The Recursive ADAPTIVE algorithm is not fast enough however to be worth using over the simple Huffman tree. 
-\paragraph{}
-We see that with very large vocabulary, the HLBL model with the Huffman tree really starts to shine in terms of speed. The factored model that performed very well in terms of perplexity and speed on the 10K WSJ vocabulary, performs much worse with the 80K BNC vocabulary. The factored model's time scales linearly with the vocabulary size. The LBL model's time also scales linearly with the vocabulary size (though with a larger scaling constant). The HLBL model on the other hand scales logarithmically. In table \ref{tab:largeVocabulary}, it becomes obvious why speed up techniques are necessary for computing language models over real language data. The HLBL model is $X\times$ faster to compute than the LBL model. Though there is a performance loss of $X\%$.
+All of the HLBL models, including using a random tree, perform better than the 5-gram Kneser Ney model,  so we see that even simple neural models are more expressive than co-occurence statistics. The best proposed HLBL model uses a Brown Cluster tree. The HLBL model with a Brown Cluster tree has a 17.24\% reduction in perplexity and a 3.93\% reduction in entropy over the 5-gram model and is not that much worse in terms of performance than the LBL model. However, creating the Brown Cluster tree is incredibly slow, and overall the total time for the model is $58\times$ slower than the LBL model. While the Brown Cluster tree performs as well as any other tree in terms of training time per epoch and testing time, the tree creation time is extremely high. As the overall purpose of this project is to find a tree that is both fast and performs reasonably, the Brown Cluster tree, sadly, does not cut it. Probably the best tree given these criteria, is the Huffman tree. The HLBL model with the Huffman tree is $2.32\times$ faster than the LBL model but 16.19\% worse in terms of perplexity and is 3.71\% worse in terms of entropy. Still, this can be a small price to pay when it comes to very large corpora with hundreds of thousands of words in their vocabulary for a $O(\frac{|V|}{log|V|})$ speed-up. The last two HLBL models use the Recursive ADAPTIVE algorithm. The Recursive ADAPIVE algorithm essentially creates Brown Cluster like trees given existing representations. The resultant trees have semantically/syntactically similar words close together in the tree. At least on a vocabulary of 10K, the Recursive ADAPTIVE algorithm is faster than the Brown Clustering algorithm at creating trees. The Recursive ADAPTIVE algorithm is not fast enough however to be worth using over the simple Huffman tree. 
 
 \begin{table*} \centering
 \ra{1.3}
@@ -242,7 +215,7 @@ Model & Tree & Reduction in Perplexity & Reduction in Entropy\\
  HLBL & $T_1$ &2.78\% & 0.58\%\\
  HLBL & $T_2$ &5.12\% & 1.17\%\\
  HLBL & $T_3$ &17.24\% & 3.93\% \\
- HLBL & $T_4$ &148\% & 3.32\%\\
+ HLBL & $T_4$ &14.8\% & 3.32\%\\
  HLBL & $T_5$ &12.84\% & 2.85\%\\
  LBL& - & 20.81\% &4.84\% \\
  Factored LBL & - &19.82\%&4.59\%\\
@@ -252,55 +225,48 @@ Model & Tree & Reduction in Perplexity & Reduction in Entropy\\
 \label{tab:reductionPerplexity}
 \end{table*}
 
-\begin{table*} \centering
-\ra{1.3}
-\begin{tabular}{@{}ccC{2cm}cc@{}}\toprule
-Model & Perplexity & Training Time Per Epoch & Testing Time & Total Time\\ 
-\midrule
- LBL&105.442 &111.05s & 21.47s & 6906.57s \\
- Factored LBL &108.802& 71.05s & 0.60s & 7887.15s\\
- HLBL with Huffman Tree &131.913& 33.26s &0.48s &3492.79s \\
-\bottomrule
-\end{tabular}
-\caption{The effect of large vocabularies on training and testing times}
-\label{tab:largeVocabulary}
-\end{table*}
-
-\subsection{Visualization}
+\subsection{Visualization} \label{sec:tsne}
 \paragraph{}
-To see what kinds of word representations were learned by the HLBL models, I use the t-SNE visualization technique described in \cite{Maaten2008} and implemented by Laurens van der Maaten. Using t-SNE, I visualized each context word representation in matrix $R$ at a point in a $2$-dimensional map. The context word is displayed on top of the location. This should give us an idea of the types of similar words that are learned. Additionally, I use t-SNE to visualize words learned by the tree in the matrix $Q$. Since $Q$ vectors do not directly correspond to words, I use the $Q$ node directly above a leaf word or leaf words to represent the word, or word-pair. After t-SNE is applied to the $Q$ vectors, the word or word-pair is then displayed on top of the $2$-dimensional location representing the $Q$ vector.
+To see what kinds of word representations are learned by the HLBL models, I use the t-SNE visualization technique described in \cite{Maaten2008} and implemented by Laurens van der Maaten. Using t-SNE, I visualized each context word representation in matrix $R$ on a two-dimensional map. The context word is displayed on top of the two-dimensional coordinates. This should give us an idea of the types of similar words that are learned. Additionally, I use t-SNE to visualize words learned by the tree in the matrix $Q$. Since $Q$ vectors do not directly correspond to words, I use the $Q$ node directly above a leaf word or leaf words to represent the word, or word-pair. After t-SNE is applied to the $Q$ vectors, the word or word-pair is then displayed on top of the two-dimensional location representing the $Q$ vector. The factored model's $R$ and $Q$ matrix are displayed as a baseline.
 \paragraph{}
-As the full visualization over all 10K vocabulary words is quite large, I have selected some areas for the Q matrices in figure \ref{fig:Qcloud} and some areas for the R matrices in figure \ref{fig:Rcloud}. A fuller version of the visualizations can be found in Appendix B. I found that the HLBL model with the random tree and Huffman tree found some Q word representations that made semantic or syntactic sense, whereas the other three trees did not. In figure \ref{fig:Qcloud} we can see that the HLBL model with the random tree clustered together numbers for the first example, and pronouns and prepositions for the second example. The HLBL model with the Huffman tree clustered together names and places. I think this may be because the random and Huffman tree HLBL models were forced to learn word "meanings" since the tree did not automatically group together similar words. For the other three models, the tree separated out the word meanings, and so instead of focusing on learning the word meanings, the model then focused on learning the decision paths. The other three models learned word representations that are optimized for correctly predicting the path through the tree. Since the other three models have better perplexities than the random and Huffman tree HLBL models, I assume this is because the other three trees have better clusterings than is learned by the HLBL model. This is supported by the fact that the Q word clouds are still relatively blobby looking and unclustered (with some exceptions), for the random and Huffman HLBL models. Additionally, the other three models have the benefit of learning the paths better.
+As the full visualization over all 10K vocabulary words is quite large, I have selected some areas from the Q word cloud in figure \ref{fig:Qcloud} and some areas for the R word cloud in figure \ref{fig:Rcloud}. A fuller version of the visualizations can be found in Appendix B. 
 \paragraph{}
-I found the same pattern as the Q matrices also held for the R matrices. We see that the HLBL models with the random and Huffman trees seem to learn some semantic or syntactic patterns whereas the other three trees did not. The two examples in figure \ref{fig:Rcloud} for the random tree have clustered together numbers and have poorly clustered together names. The Huffman tree seems to have learned verbs and prepositions. In the first example, it looks like the left word is a present tense verb, and the right word is a past tense verb, with the exception of 'pressing'. I think the reasoning behind the Huffman tree learning semantic and syntactic patterns for the R matrix is the same as the Q matrix. Since the Q and R matrices were learned jointly, it makes a lot of sense that they both show the same emphasis in learning. Another thing to note is that the Brown Cluster tree and the Recursive Adaptive trees have extremely round Q word-clouds. The representations do not seem to have clusters that are internally similar. This might mean that the Q matrices for these three trees are close to multi-dimensional Gaussians, and do not help very much with the models.
+I found the HLBL models, using the random tree and the Huffman tree, learned some Q word representations that made semantic or syntactic sense, whereas the models with the other three trees did not. In figure \ref{fig:Qcloud} we can see that the HLBL model with the random tree clustered together numbers in the first example, and pronouns and prepositions in the second example. The HLBL model with the Huffman tree clustered together names and places. I think this may be because the random and Huffman tree HLBL models are forced to learn word "meanings" since the tree does not automatically group together similar words. For the other three models, the trees separated out the word meanings, and so instead of focusing on learning the word meanings, the model then focused on learning the decision paths. The other three models learned word representations that are optimized for correctly predicting the path through the tree. Since the other three models have better perplexities than the random and Huffman tree HLBL models, I assume this is because the other three trees start off with better word clusterings than is learned by the HLBL model with random or Huffman trees. This is supported by the fact that the Q word clouds are still relatively uniform looking and unclustered (with some exceptions), for the random and Huffman HLBL models. Additionally, the other three models have the benefit of learning the paths better.
+\paragraph{}
+I found the same pattern as the Q matrices also held for the R matrices. We see that the HLBL models with the random and Huffman trees seem to learn some semantic or syntactic patterns whereas the other three trees did not. The two examples in figure \ref{fig:Rcloud} for the random tree have clustered together numbers and have clustered together names. The Huffman tree seems to have learned verbs and prepositions. In the first example for the Huffman tree, it looks like the left word is a present tense verb, and the right word is a past tense verb, with the exception of 'pressing'. I think the reason behind the random and Huffman tree HLBL models learning semantic and syntactic patterns for the R matrix is the same as the reasoning behind the models learning such patterns for the Q matrix. Since the Q and R matrices are learned jointly, it makes sense that they both show the same emphasis in learning. Another observation is that the Brown Cluster tree and the Recursive Adaptive trees have extremely round Q word-clouds. This might mean that the Q matrices for these three trees are close to multi-dimensional Gaussians, and do not help very much with the models.
 
 \begin{figure}[p]
 \centering
-\begin{tabular}{@{}m{1cm}ccc@{}}
+\begin{tabular}{@{}m{2cm}ccc@{}}
 $T_1$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_random_it71_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_random_it71_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_random_it71_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_random_it71_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_random_it71_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_random_it71_small2.png}
 \\
 $T_2$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_Huff_iter132_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_Huff_iter132_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_Huff_iter132_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Huff_iter132_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Huff_iter132_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Huff_iter132_small2.png}
 \\
 $T_3$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_Brown_iter_118_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_Brown_iter_118_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_Brown_iter_118_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Brown_iter_118_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Brown_iter_118_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Brown_iter_118_small2.png}
 \\
 $T_4$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_adaptiveR3_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_adaptiveR3_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_adaptiveR3_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptiveR3_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptiveR3_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptiveR3_small2.png}
 \\
 $T_5$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_adaptive-huffR1_it114_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_adaptive-huffR1_it114_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/Q_adaptive-huffR1_it114_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptive-huffR1_it114_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptive-huffR1_it114_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptive-huffR1_it114_small2.png}
+\\
+Factored Model &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_factored_it7_step0_05_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_factored_it7_step0_05_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_factored_it7_step0_05_small2.png}
 \end{tabular}
 \caption{Q matrices for various trees projected into two dimensions. The left-most image shows the general shape of all of the words together, and the center and right-most image show close-ups of the word cloud.}
 \label{fig:Qcloud}
@@ -308,59 +274,136 @@ $T_5$ &
 
 \begin{figure}[p]
 \centering
-\begin{tabular}{@{}m{1cm}ccc@{}}
+\begin{tabular}{@{}m{2cm}ccc@{}}
 $T_1$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_random_it71_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_random_it71_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_random_it71_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/R_random_it71_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_random_it71_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_random_it71_small2.png}
 \\
 $T_2$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_Huff_iter132_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_Huff_iter132_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_Huff_iter132_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Huff_iter132_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Huff_iter132_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Huff_iter132_small2.png}
 \\
 $T_3$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_Brown_iter_118_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_Brown_iter_118_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_Brown_iter_118_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Brown_iter_118_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Brown_iter_118_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Brown_iter_118_small2.png}
 \\
 $T_4$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_adaptiveR3_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_adaptiveR3_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_adaptiveR3_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptiveR3_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptiveR3_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptiveR3_small2.png}
 \\
 $T_5$ &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_adaptive-huffR1_it114_thumb.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_adaptive-huffR1_it114_small1.png} &
-\includegraphics[width=0.3\textwidth,width=0.18\textheight]{./images/tsne/R_adaptive-huffR1_it114_small2.png}
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptive-huffR1_it114_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptive-huffR1_it114_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptive-huffR1_it114_small2.png}
+\\
+Factored Model &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_factored_it7_step0_05_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_factored_it7_step0_05_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_factored_it7_step0_05_small2.png}
 \end{tabular}
 \caption{R matrices for various trees projected into two dimensions. The left-most image shows the general shape of all of the words together, and the center and right-most image show close-ups of the word cloud.}
 \label{fig:Rcloud}
 \end{figure}
 
-\subsection{Brown Cluster tree with Q initialization}
+\subsection{word2vec Q initialization} \label{sec:ADAPTIVEQ}
 \paragraph{}
-As the $Q$ matrices for the Brown Cluster do not seem to have been learned very well, using better word representations to initialize $Q$ may give the HLBL model with Brown Cluster trees better performance. I decided to use the word2vec toolkit representations implemented by Mikolav et al to initialize my $Q$ matrix. The word2vec toolkit is based off of the ideas in \cite{Mikolov2013}. I created word2vec representations with a skip-gram model, the hierarchical soft-max, a word-window of 5, and a representation dimensionality of 100. The representation creation took 2.309 seconds. The results for the HLBL model with the Brown Cluster tree and word2vec $Q$ initialization is given by table \ref{tab:brownWord2vec}. We see that with better $Q$ initialization, the HLBL model with a Brown Cluster tree can perform almost as well as the LBL model. The perplexity of the Brown Cluster tree is only $-0.43$ away from the LBL's perplexity. Unfortunately, this still suffers from the long creation time of the Brown Cluster tree.
+One other experiment I tried was to use better word representations to initialize $Q$. After observing that the HLBL model with the Brown Cluster tree and the Recursive ADAPTIVE trees do not seem to learn semantically or lexically motivated clusters in their Q matrices, I thought that by initializing the Q matrices better, I could push the models to learn better Q matrices. I decided to use the word2vec toolkit representations implemented by Mikolav et al to initialize my $Q$ matrix. The word2vec toolkit is based off of the ideas in \cite{Mikolov2013}. I created word2vec representations with a skip-gram model, the hierarchical soft-max, a word-window of 5, and a representation dimensionality of 100. The representation creation took 2.309 seconds running with 12 threads for the WSJ dataset. The results for the HLBL model with the Brown Cluster tree and word2vec $Q$ initialization are given by table \ref{tab:brownWord2vec}. We see that with better $Q$ initialization, the HLBL model with a Brown Cluster tree can perform almost as well as the LBL model. The perplexity of the Brown Cluster tree is only $-0.43$ away from the LBL's perplexity. Unfortunately, this still suffers from the long creation time of the Brown Cluster tree.
+\paragraph{}
+To avoid the long creation time of the Brown Cluster tree, I also tried using an ADAPTIVE tree. The ADAPTIVE tree tries to cluster together similar word representations together in the tree. If the word representations capture semantic and syntactical information, then the ADAPTIVE tree acts much like the Brown Cluster tree. To keep the tree creation time low, I did not run the ADAPTIVE algorithm recursively. Using the same word2vec representations described above, I created an ADAPTIVE tree, and also initialized the Q matrix to the word2vec representations. The results can be seen in table \ref{tab:brownWord2vec}. The ADAPTIVE tree does not perform as well as the Brown Cluster tree, but is significantly faster to create. The ADAPTIVE tree is also faster overall than the LBL model with an allowable loss in performance. 
+
+\paragraph{}
+I also tried initializing the Q matrix with the word2vec representations for the Huffman tree with no performance gain. The results can be seen in table \ref{tab:brownWord2vec}. I think this may be because the Huffman tree model does a good job learning the context words even without sensible initialization. 
 
 \begin{table*} \centering
 \ra{1.3}
-\begin{tabular}{ccccc}\toprule
-Perplexity & Epochs & Training Time Per Epoch & Testing Time & Total Time\\ 
+\begin{tabular}{cccccc}\toprule
+Tree & Perplexity & Epochs & Training Time Per Epoch & Testing Time & Total Time\\ 
 \midrule
-97.64 & 115& 30.92s & .49s& 275022.82s\\
+$T_2$ & 115.786 & 81 & 26.31s &0.46s & 2133.98s \\
+$T_3$ & 97.64 & 115& 30.92s & 0.49s& 275022.82s\\
+$T_6$& 104.477 & 83& 35.46s & 0.56s& 5013.57s\\
 \bottomrule
 \end{tabular}
-\caption{HLBL model with Brown Cluster tree and Q initialized with word2vec representations on WSJ dataset}
+\caption{HLBL model with Q initialized to word2vec representations on WSJ dataset.}
 \label{tab:brownWord2vec}
 \end{table*}
 
+\subsection{Visualization}
+\paragraph{}
+I ran the t-SNE visualizations described in section \ref{sec:tsne} over the HLBL models with Q initialized to the word2vec representations. Note that I did not include the Huffman tree with word2vec Q initialization since the model does not seem to be better than its non word2vec initialized counterpart. The results can be seen in figures \ref{fig:RcloudWord2Vec} and {fig:QcloudWord2Vec}. We see that the Q word-clouds make more semantic/syntactical clusters unlike the models without the word2vec Q initialization. This is exactly the result we were looking for. The R word-clouds remain largely unchanged. 
+
+\begin{figure}[p]
+\centering
+\begin{tabular}{@{}C{2cm}ccc@{}}
+$T_3$&
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Brown_QinWord2Vec_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Brown_QinWord2Vec_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_Brown_QinWord2Vec_small2.png}
+\\
+$T_6$ &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptive_QinWord2Vec_RinWord2Vec_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptive_QinWord2Vec_RinWord2Vec_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptive_QinWord2Vec_RinWord2Vec_small2.png}
+\end{tabular}
+\caption{R matrices for HLBL models with Q initialized to word2vec representations The left-most image shows the general shape of all of the words together, and the center and right-most image show close-ups of the word cloud.}
+\label{fig:RcloudWord2Vec}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\begin{tabular}{@{}C{2cm}ccc@{}}
+$T_2$ &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Brown_QinWord2Vec_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Brown_QinWord2Vec_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_Brown_QinWord2Vec_small2.png}
+\\
+$T_6$ &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptive_QinWord2Vec_RinWord2Vec_thumb.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptive_QinWord2Vec_RinWord2Vec_small1.png} &
+\includegraphics[width=0.15\textheight]{./images/tsne/R_adaptive_QinWord2Vec_RinWord2Vec_small2.png}
+\end{tabular}
+\caption{R matrices for HLBL models with Q initialized to word2vec representations The left-most image shows the general shape of all of the words together, and the center and right-most image show close-ups of the word cloud.}
+\label{fig:RcloudWord2Vec}
+\end{figure}
 
 
-%next line adds the Bibliography to the contents page
-\addcontentsline{toc}{chapter}{References}
-%uncomment next line to change bibliography name to references
-\renewcommand{\bibname}{References}
-\bibliography{refs}        %use a bibtex bibliography file refs.bib
-\bibliographystyle{plain}  %use the plain bibliography style
+\section{Large Vocabulary}
+\paragraph{}
+We see that with very large vocabulary, the HLBL model really pulls ahead in terms of speed. I ran some experiments with the 85K vocabulary BNC dataset.  I ran the HLBL model with two different trees, the Huffman tree and also the ADAPTIVE(word2vec) tree with Q initialized to the word2vec representations. The BNC word2vec representations took 4.960s to create running with 12 threads. 
+The factored model that performed very well in terms of perplexity and speed on the 10K WSJ vocabulary, performs much slower with the 85K BNC vocabulary. The factored model's training and testing time scales linearly with the vocabulary size. The LBL model's training and testing time also scales linearly with the vocabulary size (though with a larger scaling constant). The HLBL model on the other hand scales logarithmically. In table \ref{tab:largeVocabulary}, it becomes obvious why speed up techniques are necessary for computing language models over real language data.The HLBL model with the Huffman tree is \hl{$X\times$ faster to compute than the LBL model. Though there is a performance loss of $X\%$.} The HLBL model with the ADAPTIVE(word2vec) tree and Q initialized to word2vec representations is \hl{$X\times$ faster to compute than the LBL model and has a performance loss of $X\%$.} This makes the HLBL model with the ADAPTIVE tree and word2vec Q initialization the best model overall, of the models I explored.
 
-\end{document}
+%\begin{table*} \centering
+%\ra{1.3}
+%\begin{tabular}{@{}ccC{2cm}cc@{}}\toprule
+%Model & Perplexity & Training Time Per Epoch & Testing Time & Total Time\\ 
+%\midrule
+% LBL&105.442 &111.05s & 21.47s & 6906.57s \\
+% Factored LBL &108.802& 71.05s & 0.60s & 7887.15s\\
+% HLBL with Huffman Tree &131.913& 33.26s &0.48s &3492.79s \\
+%\bottomrule
+%\end{tabular}
+%\caption{The effect of large vocabularies on training and testing times}
+%\label{tab:largeVocabulary}
+%\end{table*}
+
+\begin{table*} \centering
+\ra{1.3}
+\begin{tabular}{@{}C{2cm}ccccC{2cm}C{2cm}C{2cm}@{}}\toprule
+Model & Tree & Q init & Perplexity & Epochs & Training Time Per Epoch & Testing Time & Total Time\\ 
+\midrule
+ LBL& - & Gaussian & ? &? &?s& ?s & ? \\
+ Factored LBL & - & Gaussian &144.32& 112 & 479.37s & 72.14s & 53761.58s\\
+ HLBL& $T_2$ & Gaussian &182.06& 117& 102.7s &30.18s &12047.61s \\
+ HLBL & $T_6$ & word2vec &159.187& 106& 129.81s &38.32s &13803.14s \\
+\bottomrule
+\end{tabular}
+\caption{The effect of a large vocabulary (85K) from the BNC dataset on training and testing times}
+\label{tab:largeVocabulary}
+\end{table*}
+  
+  
+  

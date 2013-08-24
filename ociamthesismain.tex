@@ -12,7 +12,9 @@
 \usepackage{soul}
 \usepackage{qtree}
 \usepackage{algorithm2e}
-
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
 
 %input macros (i.e. write your own macros file called mymacros.tex 
 %and uncomment the next line)
@@ -20,6 +22,10 @@
 \MakeOuterQuote{"}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
 \title{An Exploration of Novel Trees for the Hierarchical Log Bilinear Language Model}
 
@@ -58,10 +64,11 @@
 \include{chapter3}
 \include{chapter4}
 \include{chapter5}
+\include{chapter6}
 
 %now enable appendix numbering format and include any appendices
 \appendix
-\include{appendix1}
+\include{appendixA}
 
 %next line adds the Bibliography to the contents page
 \addcontentsline{toc}{chapter}{References}
