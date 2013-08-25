@@ -49,7 +49,7 @@ For most of my experiments, I use the Penn Treebank dataset. Specifically, I use
 \paragraph{}
 Real languages have much larger vocabularies than the WSJ dataset. The Oxford English Dictionary currently has 171,476 full word entries for English \cite{OED}. For a morphologically rich language, the vocabulary size can easily exceed that of English.
 \paragraph{}
-The HLBL model really shines in terms of speed with very large vocabulary sizes. The speedup using the HLBL model is order $O(\frac{|V|}{log|V|})$. To highlight this, I also run some experiments where I use a subset of the British National Corpus (BNC). I use the first 140,000 lines of the BNC, where 100,000 lines are randomly assigned to the training set and the other 40,000 lines are assigned to the test set. There are 2141639 training tokens and 902069 testing tokens. The training set has a vocabulary size of 84439 (including "\_UNK\_").The test set is preprocessed to replace any word not seen in the training set with "\_UNK\_". We can see on the 85K word vocabulary where non-HLBL models slow down immensely.
+The HLBL model really shines in terms of speed with very large vocabulary sizes. The speedup using the HLBL model is order $O(\frac{|V|}{log|V|})$. To highlight this, I also run some experiments where I use a subset of the British National Corpus (BNC). I use the first 120,000 lines of the BNC, where 100,000 lines are randomly assigned to the training set and the other 20,000 lines are assigned to the test set. There are 2141639 training tokens and 427948 testing tokens. The training set has a vocabulary size of 84439 (including "\_UNK\_").The test set is preprocessed to replace any word not seen in the training set with "\_UNK\_". We can see on the 85K word vocabulary where non-HLBL models slow down immensely.
 
 
 %WSJ sections 2-21, with words that occur only once preprocessed out, as a training set. This set has a vocabulary size of 23768. 
@@ -349,8 +349,8 @@ $T_6$ &
 \includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptive_QinWord2Vec_RinWord2Vec_small1.png} &
 \includegraphics[width=0.15\textheight]{./images/tsne/Q_adaptive_QinWord2Vec_RinWord2Vec_small2.png}
 \end{tabular}
-\caption{R matrices for HLBL models with Q initialized to word2vec representations The left-most image shows the general shape of all of the words together, and the center and right-most image show close-ups of the word cloud.}
-\label{fig:RcloudWord2Vec}
+\caption{Q matrices for HLBL models with Q initialized to word2vec representations The left-most image shows the general shape of all of the words together, and the center and right-most image show close-ups of the word cloud.}
+\label{fig:QcloudWord2Vec}
 \end{figure}
 
 \begin{figure}[p]
