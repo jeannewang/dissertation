@@ -1,0 +1,103 @@
+
+\chapter{Visualization of the R and Q matrices}
+\paragraph{}
+To get a better idea of the types of representations learned by the models, I present the t-SNE visualizations of the learned R and Q matrices. Only the first 1000 vectors of each matrix are shown.
+
+%start of Q
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=100 0 0 0]{./images/tsne/1000s/Q_random_it71_1000words.png} 
+\centering
+\caption{First 1000 vectors of the Q matrix for the HLBL model with a random tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=100 0 0 0]{./images/tsne/1000s/Q_Huff_iter132_1000words.png} 
+\centering
+\caption{First 1000 vectors of the Q matrix for the HLBL model with a Huffman tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=100 0 0 0]{./images/tsne/1000s/Q_Brown_iter_118_1000words.png} 
+\centering
+\caption{First 1000 vectors of the Q matrix for the HLBL model with a Brown Cluster tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=100 0 0 0]{./images/tsne/1000s/Q_adaptiveR3_1000words.png} 
+\centering
+\caption{First 1000 vectors of the Q matrix for the HLBL model with an ADAPTIVE(3,random) tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=100 0 0 0]{./images/tsne/1000s/Q_adaptive-huffR1_it114_1000words.png} 
+\centering
+\caption{First 1000 vectors of the Q matrix for the HLBL model with an ADAPTIVE(2,Huffman) tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=100 0 0 0]{./images/tsne/1000s/Q_factored_it7_step0_05_1000words.png} 
+\centering
+\caption{First 1000 vectors of the Q matrix for the factored LBL model projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=100 0 0 0]{./images/tsne/1000s/Q_Brown_QinWord2Vec_1000words.png} 
+\centering
+\caption{First 1000 vectors of the Q matrix for the HLBL model with a Brown Cluster tree and word2vec Q initialization projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=100 0 0 0]{./images/tsne/1000s/Q_adaptive_QinWord2Vec_RinWord2Vec_1000words.png} 
+\centering
+\caption{First 1000 vectors of the Q matrix for the HLBL model with a ADAPTIVE(word2vec) tree and word2vec Q initialization projected into two-dimensions using t-SNE}
+\end{figure}
+
+
+%start of R
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=120 0 0 0]{./images/tsne/1000s/R_random_it71_1000words.png} 
+\centering
+\caption{First 1000 vectors of the R matrix for the HLBL model with a random tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=120 0 0 0]{./images/tsne/1000s/R_Huff_iter132_1000words.png} 
+\centering
+\caption{First 1000 vectors of the R matrix for the HLBL model with a Huffman tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=120 0 0 0]{./images/tsne/1000s/R_Brown_iter_118_1000words.png} 
+\centering
+\caption{First 1000 vectors of the R matrix for the HLBL model with a Brown Cluster tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=120 0 0 0]{./images/tsne/1000s/R_adaptiveR3_1000words.png} 
+\centering
+\caption{First 1000 vectors of the R matrix for the HLBL model with an ADAPTIVE(3,random) tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=120 0 0 0]{./images/tsne/1000s/R_adaptive-huffR1_it114_1000words.png} 
+\centering
+\caption{First 1000 vectors of the R matrix for the HLBL model with an ADAPTIVE(2,Huffman) tree projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=120 0 0 0]{./images/tsne/1000s/R_factored_it7_step0_05_1000words.png} 
+\centering
+\caption{First 1000 vectors of the R matrix for the factored LBL model projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=120 0 0 0]{./images/tsne/1000s/R_Brown_QinWord2Vec_1000words.png} 
+\centering
+\caption{First 1000 vectors of the R matrix for the HLBL model with a Brown Cluster tree and word2vec Q initialization projected into two-dimensions using t-SNE}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[height=.85\textheight,trim=120 0 0 0]{./images/tsne/1000s/R_adaptive_QinWord2Vec_RinWord2Vec_1000words.png} 
+\centering
+\caption{First 1000 vectors of the R matrix for the HLBL model with a ADAPTIVE(word2vec) tree and word2vec Q initialization projected into two-dimensions using t-SNE}
+\end{figure}

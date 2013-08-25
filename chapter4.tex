@@ -104,7 +104,7 @@ To train the HLBL model, we need a way to minimize the MLE parameters $\hat{\the
 \emph{Gradient descent} is a first-order optimization algorithm. The basic idea behind gradient descent is to move in the direction of the negative gradient on each time step until the gradient becomes zero. When the gradient is zero, we have hit a local minimum. Since the MLE parameters minimize $-J(\theta)$, we can apply gradient descent to the parameters $\theta$. Of course, even if we are constantly moving in the direction of the gradient, we may be moving towards it in too small steps or too large steps. This is why we include a learning rate $\gamma$, to control the step size at which we move toward the minimum. The learning rate $\gamma$ is typically fixed, and found by trial and error \cite{Elkan2013}.
 A single step of gradient descent is given by:
 \begin{align}
-\theta := \theta - \gamma \sum_{i=1}^{m} \nabla_\theta \left( -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2 \right) \label{eg:gradientDescent} 
+\theta := \theta - \gamma \nabla_\theta \left( -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2 \right) \label{eg:gradientDescent} 
 \end{align}
 Where $m$ is the total number of training examples.
 
@@ -138,7 +138,7 @@ Gradient descent updates the parameters once for every full sweep though all of 
 The \emph{stochastic gradient descent} algorithm is almost the same as gradient descent except that all of the parameters are updated after each training example. Also, the training examples are trained in random order. Intuitively, stochastic gradient descent approximates the gradient over all examples, by using a single random example. Stochastic gradient decent can converge to good parameter values in much fewer training iterations than gradient descent. A single iteration of stochastic gradient descent takes order $O(M\times F \times D)$ where $M$ is the number of training examples, $D$ is the dimensionality of the feature vector and $F$ is the average number of non-zero features per example \cite{Elkan2013}. 
 A stochastic gradient descent update looks like:
 \begin{align}
-\theta := \theta - \gamma \nabla_\theta \left( -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2 \right)
+\theta := \theta - \gamma \nabla_\theta \left( -ln(P(w_i | w_{i-(n-1)},\dots, w_{i-1})) +  \mu ||\theta||^2_2 \right)
 \end{align}
 \subsubsection{Mini-batches}
 \paragraph{}
@@ -147,7 +147,7 @@ A compromise between gradient descent and stochastic gradient descent is to use 
 
 A single step of stochastic gradient descent using mini-batches looks like:
 \begin{align}
-\theta := \theta - \gamma \sum_{i=1}^{K} \nabla_\theta \left( -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2 \right)
+\theta := \theta - \gamma  \sum_{i=1}^{k} \nabla_\theta \left( -ln(P(w_i | w_{i-(n-1)},\dots, w_{i-1})) +  \mu ||\theta||^2_2 \right)
 \end{align}
 Where $k$ is the mini-batch size.
 \paragraph{}
