@@ -6,7 +6,7 @@
 \paragraph{}
 The hierarchical log bilinear model proposed by Andriy Mnih and Geoffrey Hinton in \cite{MnihHinton2009} is the starting point for my project. Mnih and Hinton make it clear that varying the binary trees used for the hierarchical representation of the vocabulary can make a significant difference in the performance and speed of the model. To be specific, "trees
 that are well-supported by the data and are reasonably well-balanced so that the resulting models
-generalize well and are fast to train and test" should be used \cite[pg. 5]{MnihHinton2009}. While Mnih and Hinton propose several effective trees to use in the HLBL model, I will explore the effects of other types of binary trees. I intend to test out Huffman encoding trees, Brown Clustering trees, simple overcomplete trees and Recursive ADAPTIVE trees.
+generalize well and are fast to train and test" should be used \cite[pg. 5]{MnihHinton2009}. While Mnih and Hinton propose  effective trees to use in the HLBL model, I will explore the effects of three new binary trees. I intend to test out Huffman encoding trees, Brown Clustering trees, and Recursive ADAPTIVE trees.
 \subsection{Motivation}
 \paragraph{}
 The HLBL model can be made faster and more accurate by using good decision trees. There is a trade-off between the expressiveness of the model's learned node representations and the number of decisions that must be made per word. In the ideal situation, the learned node representations would exactly capture their constituent words' semantic/lexical properties and also the correct decision path through the tree. In absence of the ideal, we would like to make the decision process easier to learn so the representations can capture the semantic/lexical properties better. Minh and Hinton do a good job creating trees that alleviate this burden, but I would like to explore even simpler trees in the hope that they can also capture useful decisions. Hopefully, trees that are simple to create and understand will also perform well in the HLBL model. 
@@ -32,7 +32,7 @@ The objective function ($J$) , also known as the \emph{likelihood}, for the HLBL
 &\sigma(x) = \frac{1}{1+e^{-x}} \label{eq:sigmoid} \nonumber
 \end{align}
 
-Where $\theta$ is shorthand for all of the parameters of the model: $Q,R,B$,and $C_i$ for all context positions. $m$ is the size of the training set.  $b_j(w_i)$ is the binary decision for word $w_i$ at node $j$. $q_j$ is the vector representation for node $j$, and $b_{j}$ is a bias term for node $j$. $r_{w_i}$ is the vector representation for context word $w_i$, and $C_i$ is the matrix that corresponds to the interaction between the $i$th context word and the target node.  $\hat{r}$ can be thought of as a prediction vector for $w_i$. Note that there is a simplifying assumption that binary decision predictions are independent of each other.
+Where $\theta$ is shorthand for all of the parameters of the model: $Q,R,B$,and $C_i$ for all context positions. $m$ is the size of the training set.  $b_j(w_i)$ is the binary decision for word $w_i$ at node $j$. $q_j$ is the vector representation for node $j$, and $b_{j}$ is a bias term for node $j$. $r_{w_i}$ is the vector representation for context word $w_i$, and $C_i$ is the matrix that corresponds to the interaction between the $i$th context word and the target node.  $\hat{r}$ can be thought of as a prediction vector for $w_i$. Note the use of the simplifying assumption that binary decision predictions are independent of each other.
 \paragraph{}
 We would like to choose parameters ($\hat{\theta}$), such that $\hat{\theta} = \argmax_\theta J(\theta;w_i,\dots, w_m)$. $\hat{\theta}$ is known as the \emph{maximum likelihood estimator} of $\theta$ \cite{Elkan2013}.  In our actual usage of the objective function we will modify it slightly. We can take the negative natural logarithm of the objective function to get the negative log likelihood. Charles Elkan states that "[b]ecause logarithm is a monotonic strictly increasing function, maximizing the log likelihood is precisely equivalent to maximizing the likelihood, and also to minifmizing the negative log likelihood" \cite[pg. 3]{Elkan2013}. So instead of maximizing the likelihood, we now minimize the negative log likelihood such that  $\hat{\theta} = \argmin_\theta -ln(J(\theta;w_i,\dots, w_m))$.
 Using some logarithm rules we see that:
@@ -47,7 +47,7 @@ Using some logarithm rules we see that:
 \end{align}
 
 \paragraph{}
-We use the logarithm of the objective function because it changes the products into sums which are easier to calculate and are less likely to overflow or underflow on a computer. Additionally, using logarithms can make the gradients easier to derive as natural log is very easy to differentiate.
+We use the logarithm of the objective function because it changes the products into sums which are easier to calculate and are less likely to overflow or underflow on a computer. Additionally, using logarithms can make the gradients easier to derive as natural log is easy to differentiate.
 
 
 \subsubsection{Probability Mass Function}
@@ -80,7 +80,7 @@ Where $\mu$ is the regularization parameter that controls the tradeoff between m
 
 \subsubsection{Similarity to Logistic Regression}
 \paragraph{}
-The HLBL model is actually very similar to logistic regression. We can think of HLBL as logistic regression with knowledge of context words. 
+The HLBL model is actually similar to logistic regression. We can think of HLBL as logistic regression with knowledge of context words. 
 The standard logistic regression model looks like:
 \begin{align}
 p(y =1 | x; \alpha, \beta) = \sigma \left( \sum_{j=1}^d \beta_j x_j + \alpha \right)
@@ -93,15 +93,15 @@ We can then compare it against the HLBL model:
 \begin{align}
 P(b_j(w_i) = 1 | q_j, w_{i-(n-1)},\dots, w_{i-1}) =  \sigma( (\sum_i C_i r_{w_i})^T q_{j} +b_{j})
 \end{align}
-We see that most of the two models are the same, the main difference being the addition of the $C_i$ matrices.  The $C_i$ matrices hold parameters that deal with the interactions between context words and nodes in the tree. $q_j$ also plays a different role. In the logistic regression model, $q_j$ is a weight for word $w_j$, whereas in the HLBL model, $q_j$ is a vector representation for a node in the tree. Still, the models are very similar and we can think of HLBL as logistic regression for nodes in the tree, weighted by context prediction vectors.
+We see that most of the two models are the same, the main difference being the addition of the $C_i$ matrices.  The $C_i$ matrices hold parameters that deal with the interactions between context words and nodes in the tree. $q_j$ also plays a different role. In the logistic regression model, $q_j$ is a weight for word $w_j$, whereas in the HLBL model, $q_j$ is a vector representation for a node in the tree. Still, the models are similar and we can think of HLBL as logistic regression for nodes in the tree, weighted by context prediction vectors.
 
 
 \subsection{Model training}
 \paragraph{}
-To train the HLBL model, we need a way to minimize the MLE parameters $\hat{\theta}$. One way to minimize the parameters is through an iterative scheme that is guaranteed to move closer to the (local) minimum on each step called gradient descent. The HLBL objective function is smooth and so is easily differentiable. However, it is not convex so it may have more than a one minimum. 
+To train the HLBL model, we need a way to minimize the MLE parameters $\hat{\theta}$. One way to minimize the parameters is through an iterative scheme that is guaranteed to move closer to the (local) minimum on each step called gradient descent. The HLBL objective function is smooth and so is easily differentiable. However, it is not convex so it may have more than one minimum. 
 \subsubsection{Gradient Descent}
 \paragraph{}
-\emph{Gradient descent} is a first-order optimization algorithm. The basic idea behind gradient descent is to move in the direction of the negative gradient on each time step until the gradient becomes zero. When the gradient is zero, we have hit a local minimum. Since the MLE parameters minimize $-J(\theta)$, we can apply gradient descent to the parameters $\theta$. Of course, even if we are constantly moving in the direction of the gradient, we may be moving towards it in too small steps or too large steps. This is why we include a learning rate $\gamma$, to control the step size at which we move toward the minimum. The learning rate $\gamma$ is typically fixed, and found by trial and error \cite{Elkan2013}.
+\emph{Gradient descent} is a first-order optimization algorithm. The basic idea behind gradient descent is to move in the direction of the negative gradient on each time step until the gradient becomes zero. When the gradient is zero, we have hit a local minimum. Since the MLE parameters minimize $-J(\theta)$, we can apply gradient descent to the parameters $\theta$. Of course, even if we are constantly moving in the direction of the gradient, we may be moving towards it in too small steps or too large steps. With too small a step size, we converge to the minimum very slowly. With too large a step size, we can overshoot the minimum and actually get farther and farther away from the minimum. The learning rate $\gamma$, controls the step size at which we move toward the minimum. The learning rate $\gamma$ is typically fixed, and found by trial and error \cite{Elkan2013}.
 A single step of gradient descent is given by:
 \begin{align}
 \theta := \theta - \gamma \nabla_\theta \left( -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2 \right) \label{eg:gradientDescent} 
@@ -176,7 +176,7 @@ Where $K$ is the number of testing examples.
 
 \section{Tree creation} \label{sec:treeCreation}
 \paragraph{}
-The binary tree used in the HLBL model can make a significant difference to the model performance and speed. In this dissertation, I will explore four different types of trees.
+The binary tree used in the HLBL model can make a significant difference to the model performance and speed. In this dissertation, I will explore three different types of trees.
 \subsection{Huffman Trees}
 \paragraph{}
 \emph{Huffman coding} is an optimal prefix code created using a bottom-up agglomerative approach. Huffman coding was introduced by David Huffman in \cite{Huffman1952}. Huffman codes minimize the average number of bits needed to convey a message. In my usage, the Huffman code minimizes the average number of bits to convey a word in the vocabulary. In Huffman coding, each word has a single unique code.
@@ -185,7 +185,7 @@ I want to explore using Huffman Trees in the HLBL model because Huffman trees ar
 \paragraph{}
 As Huffman codes are variable length codes, it is important that Huffman codes are also prefix codes. The prefix property states that no code appears as the prefix for another code. This makes decoding possible without knowing code lengths and also makes representing the codes as a binary tree possible. 
 \paragraph{}
-To create a Huffman code, a probability distribution over all words must be known. Given that we have an exact unigram distribution of the training data, Huffman coding is a very appealing option. To create a Huffman code, first, each word is assigned to its own cluster.  The clusters are then arranged in order of least probable to most probable. Next, the two least probable clusters are merged together recursively until there is only one cluster left. The probability of a cluster is simply the sum its constituent word probabilities. In this way, shorter codes will always represent more frequent words, and longer codes will represent more infrequent words. Huffman codes create a single unique code per word.
+To create a Huffman code, a probability distribution over all words must be known. Given that we have an exact unigram distribution of the training data, Huffman coding is an appealing option. To create a Huffman code, first, each word is assigned to its own cluster.  The clusters are then arranged in order of least probable to most probable. Next, the two least probable clusters are merged together recursively until there is only one cluster left. The probability of a cluster is simply the sum its constituent word probabilities. In this way, shorter codes will always represent more frequent words, and longer codes will represent more infrequent words. Huffman codes create a single unique code per word.
 \paragraph{}
 The Huffman tree is created while computing the Huffman code. Each word is a leaf in the tree and each merge can be seen as a decision node in the tree. A decision node's children are the two nodes that were merged together. The Huffman code for a word is the list of binary decisions taken from the root node to the word node.
 
@@ -208,7 +208,6 @@ Put each word $w_1,\dots,w_{|V|}$ into its own node: $n_1\dots,n_{|V|}$
 $n_1$ = dequeued node from $Queue2$
 \\ \Return $n_1$
 \end{algorithm}
-
 
 \subsubsection{Creation Complexity}
 \paragraph{}
@@ -236,14 +235,13 @@ between adjacent classes. We then merge that pair of classes for which the loss 
 average mutual information is least. After V - C of these merges, C classes remain. 
 Often, we find that for classes obtained in this way the average mutual information 
 can be made larger by moving some words from one class to another. Therefore, after 
-having derived a set of classes from successive merges, we cycle through the vocabu- 
-lary moving each word to the class for which the resulting partition has the greatest 
+having derived a set of classes from successive merges, we cycle through the vocabulary moving each word to the class for which the resulting partition has the greatest 
 average mutual information. Eventually no potential reassignment of a word leads to 
 a partition with greater average mutual information. At this point, we stop" \cite[pg. 472]{Brown1992}.  
 Note that Brown clustering results in each word belonging to a single cluster. Also, Brown clusters with a mutual information criteria tend to put together words that are semantically similar.
 \paragraph{}
-This algorithm can be improved upon, as Percy Liang demonstrates in \cite{Liang2005}. The new algorithm is very similar except that only the top $m$ most frequent words are put into their own clusters to begin with. The next words are then merged into one of the $m$ clusters based on some criteria. Once all the words are in one of the $m$ clusters, the $m$ clusters are merged based on the same criteria.
-The criteria used by Liang is:
+This algorithm can be improved upon, as Percy Liang demonstrates in \cite{Liang2005}. The new algorithm is similar except that in the beginning only the top $m$ most frequent words are put into their own clusters. The next words are then merged into one of the $m$ clusters based on a similarity metric. Once all the words are in one of the $m$ clusters, the $m$ clusters are merged based on the same similarity metric.
+The similarity metric used by Liang is:
 \begin{align}
 Quality(C) = \sum_{c,c'} I(c,c') - H
 \\
@@ -279,9 +277,10 @@ Calculation of the original Brown clusters takes $O(|V|^5)$ calculations and Bro
 
 \subsection{Recursive ADAPTIVE Trees}
 \paragraph{}
-Another tree introduced in \cite{MnihHinton2009} is the ADAPTIVE tree. The ADAPTIVE tree is also mentioned in section \ref{sec:HLBL}. The ADAPTIVE tree is created top-down by clustering on learned word representations. The clustering method is a mixture of two Gaussians. The clusters are created with respect to the most responsible Gaussian, which generally creates a non-balanced tree. The real power behind this method comes from the learned word representations which are better than unigram or co-occurance statistics that inform Huffman and Brown cluster trees. The ADAPTIVE tree is in tune with the model, and creates decision nodes that are easy to navigate for the model. 
+Another tree introduced in \cite{MnihHinton2009} is the ADAPTIVE tree. The ADAPTIVE tree is also mentioned in section \ref{sec:HLBL}. The ADAPTIVE tree is created top-down by clustering on learned prediction vectors. The clustering method is a mixture of two Gaussians. The clusters are created with respect to the most responsible Gaussian, which generally creates a non-balanced tree. The real power behind this method comes from clustering on learned prediction vectors which are better than the unigram or co-occurance statistics that inform Huffman and Brown cluster trees. The ADAPTIVE tree creates decision nodes that separate dissimilar prediction vectors, and cluster similar prediction vectors. 
+
 \paragraph{}
-Mnih and Hinton use learned word representations from the HLBL model with a random tree. I think starting off with a better tree such as a Huffman tree or a Brown Cluster tree for the initial HLBL model can improve the ADAPTIVE tree performance. Additionally, I think recursively training the ADAPTIVE tree, on the results from the HLBL model with an ADAPTIVE tree could be very fruitful. Essentially by recursively adapting the tree, the tree can better capture the learned word representations, which results in better learned word representations. 
+Mnih and Hinton use learned prediction vectors from the HLBL model with a random tree. I think starting off with a better tree such as a Huffman tree or a Brown Cluster tree for the initial HLBL model can improve the ADAPTIVE tree performance. Additionally, I think recursively training the ADAPTIVE tree, on the results from the HLBL model with an ADAPTIVE tree could be fruitful. Essentially by recursively adapting the tree, the tree can better capture the learned word representations, which results in better learned word representations. 
 \subsubsection{Recursive ADAPTIVE Pseudo-code}
 
 \begin{algorithm}

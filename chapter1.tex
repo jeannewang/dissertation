@@ -4,19 +4,19 @@
 In the field of computational linguistics, statistical language modeling is a cornerstone task. The use of language models  is universal in applications such as machine translation and speech recognition.  Improving upon language models can improve the performance of these important applications and future applications that involve language models.
 \section{Motivation}
 \paragraph{}
-The state-of-the-art language models are all neural-based models. In spite of this, n-gram models are still incredibly prevalent and widely used. Neural-based models are unattractive to use due to their very long training and testing times. The training of a large neural-network based model can take weeks, as opposed to the minutes an n-gram model takes. While neural networks may never be as fast as n-gram models to train and test, these models can become much more attractive with shorter training and testing times. If a user only had to wait hours for his model instead of weeks, neural models become a much more persuasive option.
+The state-of-the-art language models are all neural-based models. In spite of this, n-gram models are still incredibly prevalent and widely used. Neural-based models are unattractive to use due to their long training and testing times. The training of a large neural-network based model can take weeks, as opposed to the minutes an n-gram model takes. While neural networks may never be as fast as n-gram models to train and test, these models can become much more attractive with shorter training and testing times. If a user only had to wait hours for his model instead of weeks, neural models become a much more persuasive option.
 \paragraph{}
 Additionally, given the large amount of buzz and research around \emph{deep-learning}, neural models are only going to get better in the future. It becomes paramount to find ways to speed up these models for both research and commercial usage.
 \paragraph{}
-One way to speed up these models is to apply a hierarchical structure to the neural model. This dissertation will explore using such a hierarchical model and various forms of heirarchy.
+One way to speed up these models is to apply a hierarchical structure to the neural model. This dissertation will explore using such a hierarchical model and new forms of hierarchy.
 
 \section{Objectives}
 \paragraph{}
-One simple neural-based model with good performance is the Log Bilinear model \cite{MnihHinton2007}. I would like to apply a hierarchical structure to it in the form of the Hierarchical Log Bilinear model \cite{MnihHinton2009}. The hierarchical structure, or tree, can be interchanged freely. I would like to explore various trees to improve the model performance. The objective of this project is to explore novel trees with the Hierarchical Log Bilinear model in order to find a tree that is fast to train, test and create and performs well in comparison to the standard Log Bilinear model.
+One simple neural-based model with good performance is the log bilinear model \cite{MnihHinton2007}. I would like to apply a hierarchical structure to it in the form of the hierarchical log bilinear model \cite{MnihHinton2009}. The hierarchical structure, or tree, can be interchanged freely. I would like to explore various trees to improve the model performance. The objective of this project is to explore novel trees with the hierarchical log bilinear model in order to find a tree that is fast to train, test and create and performs well in comparison to the standard log bilinear model.
 
 \section{Outline}
 \paragraph{}
-In the first part of this dissertation I will cover various language models including the n-gram model, maximum entropy model, neural probabilistic model, feed-forward neural network model, recurrent neural network model and the log bilinear model. Additionally, I will describe extensions to these models and model evaluation techniques.
+In the first part of this dissertation I will cover language models including the n-gram model, maximum entropy model, neural probabilistic model, feed-forward neural network model, recurrent neural network model and the log bilinear model. Additionally, I will describe extensions to these models and model evaluation techniques.
 
 \paragraph{}
 Next, I will cover speed-up techniques for language models and describe why I have decided to focus on using a hierarchical method. These speed-up techniques include class-based methods, hierarchical-based methods, gradient approximation methods, vocabulary truncation, diagonalizing context matrices, and also switching the training order.

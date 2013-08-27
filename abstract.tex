@@ -1,9 +1,9 @@
 \begin{abstract}
 
-Statistical language models are of great importance to many natural language processing tasks. The state-of-the-art language models are neural-based models. These models tend to be slow to train and test. Models can easily take weeks to train on large corpora. 
+Statistical language models are of great importance to natural language processing tasks. The state-of-the-art language models are neural-based models. These models tend to be slow to train and test. Models can easily take weeks to train on large corpora. 
 
-This dissertation proposes to use hierarchical decompositions of a particular neural model, the log-bilinear model, in order to speed up training and testing times. Using a hierarchical log-bilinear model, training and testing times can be logarithmically sped up. This dissertation focuses on using various forms of the hierarchical structure including Huffman Trees, Brown Cluster trees, and Recursive ADAPTIVE trees. Additionally, a new model initialization value is explored.
+This dissertation proposes to use hierarchical decompositions of a particular neural model, the log-bilinear model, in order to speed up training and testing times. Using a hierarchical log-bilinear model, training and testing times can be logarithmically sped up. This dissertation focuses on using new forms of the hierarchical structure including Huffman Trees, Brown Cluster trees, and Recursive ADAPTIVE trees. Additionally, a new model initialization value is explored.
 
-The model is assessed with a series of experiments that show the various pros and cons of each method. It is shown that an ADAPTIVE tree trained on semantic/syntactic word embeddings and with proper initialization can perform \hl{$X\times$ faster than the standard log-bilinear model with an acceptable performance loss of X\% on the British National Corpus dataset}.
+The model is assessed with a series of experiments that show the pros and cons of each method. It is shown that an ADAPTIVE tree trained on semantic/syntactic word embeddings and with proper initialization can perform $3.89\times$ faster than the factored log-bilinear model with an acceptable entropy loss of $1.93\%$ on the British National Corpus dataset.
 
 \end{abstract}
