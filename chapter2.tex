@@ -21,7 +21,7 @@ P(w_m | w_1,\dots, w_{m-1})
 \end{align}
 In this dissertation, I will generally define language models in terms of individual word probabilities.
 \paragraph{}
-Language modeling is generally applied to natural languages such as English, French, Chinese, etc. There is a large bias towards certain languages, especially English in terms of corpora and subsequently research. Statistical language models have benefited greatly from the proliferation and widespread availability of large text corpora on the internet.  Having larger amounts of data is particularly useful in statistical language modeling since model parameters are trained more accurately with larger training sets. 
+Language modeling is typically applied to natural languages such as English, French, Chinese, etc. There is a large bias towards certain languages, especially English in terms of corpora and subsequently research. Statistical language models have benefited greatly from the proliferation and widespread availability of large text corpora on the internet.  Having larger amounts of data is particularly useful in statistical language modeling since model parameters are trained more accurately with larger training sets. 
 
 \section{Language Model Usages}
 \paragraph{}
@@ -29,40 +29,44 @@ Language models are an integral part of many computational linguistic applicatio
 
 \section{Training and Testing sets}
 \paragraph{}
-Statistical language models are generally trained and tested on different subsets of the same data. Both training and testing sets are drawn from the same distribution. If the model is trained on the training set without over fitting, it should generalize well to the test set. In practice, a third development set is often used as a substitute for the test set during development. This is to prevent bias in hand-tweaked parameters when finally testing on the test set. Often the full corpus is divided randomly into 80\% training set, 10\% development set, and 10\% test set.
+Statistical language models are generally trained and tested on different subsets of the same data. Both training and testing sets are drawn from the same distribution. If the model is trained on the training set without overfitting, it should generalize well to the test set. In practice, a third development set is often used as a substitute for the test set during development. This is to prevent bias in hand-tweaked parameters when finally testing on the test set. Often the full corpus is divided randomly into 80\% training set, 10\% development set, and 10\% test set.
 
 \section{N-gram Models}
 \paragraph{}
-The \emph{n-gram} model is a widely used language model and forms the basis for more advanced language models. The n-gram model is essentially a look-up table of word co-occurance statistics \cite{Jurafsky2009}. Due to its look-up table nature, the n-gram model is bad at generalizing to test data absent from the training data. The $n$ in n-gram comes from the $n$ word context that the n-gram model considers to predict word probabilities. A unigram model will use zero words for its history, a 3-gram model will use two words for its history, etc.  Even though n-gram language models are simple, they are very effective when training and testing sets are similar. n-gram models are the de facto standard language model. More complicated models only marginally best n-gram performance and are much more computationally intensive. \cite{Mikolov2012}. 
-In an n-gram model, the probability of observing a sequence $w_1, \dots, w_m$ is approximated using the Markov assumption as:
+The \emph{n-gram} model is a widely used language model and forms the basis for more advanced language models. The n-gram model is essentially a look-up table of word co-occurance statistics \cite{Jurafsky2009}. Due to its look-up table nature, the n-gram model is bad at generalizing to test data absent from the training data. The $n$ in n-gram comes from the $n -1$ word context that the n-gram model considers to predict the word probability of the $n$th word. A unigram model will use zero words for its history, a bi-gram model will use a single word for its history, a 3-gram model will use two words for its history, etc.  Even though n-gram language models are simple, they are very effective when training and testing sets are similar. N-gram models are the de facto standard language model. More complicated models only marginally best n-gram performance and are much more computationally expensive to train/test \cite{Mikolov2012}. 
+In an n-gram model, the probability of observing a sequence $w_1, \dots, w_m$ is approximated using the Markov assumption:
 \begin{align}
 P(w_1,\dots,w_m) = \prod^{m}_{i=1} P(w_i|w_1,\dots, w_{i-1}) \approx  \prod^{m}_{i=1} P(w_i | w_{i-(n-1)},\dots, w_{i-1}) 
-\\P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{count(w_{i-(n-1)},\dots,w_{i-1},w_i)}{count(w_{i-(n-1)},\dots,w_{i-1})}
 \end{align}
+The maximum likelihood estimation of a word probability is given by:
+\begin{align}
+P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{count(w_{i-(n-1)},\dots,w_{i-1},w_i)}{count(w_{i-(n-1)},\dots,w_{i-1})} 
+\end{align}
+
 \subsection{Markov assumption}
 \paragraph{}
-The \emph{Markov assumption} used in language models states that instead of using the entire previous history of words to compute the probability of the next word, we can use simply the $n$ previous words \cite{Jurafsky2009}. The intuition is that nearby words are more statistically significant than words that are farther away. Also, the order of the last $n$-words is taken into account. While this assumption is false, in practice it seems to work well. n-gram models and all of the subsequent language models that are discussed use the Markov assumption.
+The \emph{Markov assumption} used in language models states that instead of using the entire previous history of words to compute the probability of the next word, we can use simply the $n$ previous words \cite{Jurafsky2009}. The intuition is that nearby words are more statistically significant than words that are farther away. Also, the order of the last $n$-words is taken into account. While this assumption is false, in practice it seems to work well. N-gram models and all of the subsequent language models that are discussed use the Markov assumption.
 \subsection{Curse of Dimensionality}
 \paragraph{}
-The \emph{curse of dimensionality} refers to the increasing difficulty of searching though high dimensional spaces as the number of dimensions grows. The curse of dimensionality diminishes the benefit of contexts larger than five for n-grams. Unfortunately this means that n-grams cannot express long-distance relationships or long-distance dependencies in texts. Data becomes sparse as we increase the number of dimensions. Even over millions of examples in large corpora, it is rare to see the same long word sequence repeated (where long is 6+ words). If exact test data sequences are not seen in training data then n-gram models perform poorly.
+The \emph{curse of dimensionality} refers to the increasing difficulty of searching though high dimensional spaces as the number of dimensions grows. The curse of dimensionality diminishes the benefit of contexts larger than five for n-grams. Unfortunately this means that n-grams cannot express long-distance relationships or long-distance dependencies in texts. Data becomes sparse as we increase the number of dimensions. Even over millions of examples in large corpora, it is rare to see the same long word sequence repeated (where long is 6+ words). Again due to the look-up nature of the n-gram, if exact test data sequences are not seen in training data then n-gram models perform poorly.
 \subsection{Smoothing}
 \paragraph{}
-n-gram models deal with unseen word sequences (often due to the curse of dimensionality, or small corpora) with smoothing. Smoothing "...redistribut[es] probabilities between seen and unseen (zero-frequency) events, by
+N-gram models deal with unseen word sequences (often due to the curse of dimensionality, or small corpora) using smoothing. Smoothing "\dots redistribut[es] probabilities between seen and unseen (zero-frequency) events, by
 exploiting the fact that some estimates, mostly those based on single observations, are greatly over-estimated" \cite[pg. 16]{Mikolov2012}.
 \subsubsection{Laplacian Smoothing}
 \paragraph{}
-The simplest form of smoothing is Laplacian smoothing also known as add one smoothing \cite{Jurafsky2009}. With this type of smoothing, all sequence counts are increased by one. This means that all sequences will have a non-zero probability. 
+The simplest form of smoothing is Laplacian smoothing also known as add one smoothing~\cite{Jurafsky2009}. With this type of smoothing, all sequence counts are increased by one. This means that all sequences will have a non-zero probability. 
 \begin{align}
 P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{count(w_{i-(n-1)},\dots,w_{i-1},w_i)+1}{count(w_{i-(n-1)},\dots,w_{i-1})+|V|}
 \end{align}
-where $|V|$ is the size of the vocabulary. While this does solve the issue of zero-frequency elements, Laplacian smoothing gives bad estimates. 
+where $|V|$ is the size of the vocabulary. While this does solve the issue of zero-frequency elements, Laplacian smoothing gives bad estimates. This is because Laplacian smoothing does not take advantage of any prior information about the word probability distribution.
 \subsubsection{Advanced Smoothing Techniques}
 \paragraph{}
- Other smoothing techniques that have been applied to n-gram models include: Good-Turing, Katz back-off models, interpolated models, and modified Kneser-Ney models. Modified Kneser-Ney is generally the preferred smoothing method. These smoothing techniques use knowledge of rarely seen words to estimate counts of unseen words. The Good-Turning approach modifies the counts of word sequences to be more similar to word sequences seen more frequently. The Katz back-off model backs-off to lower order n-gram models for zero-frequency word sequences. Interpolated models interpolate between different order n-gram models. Modified Kneser-Ney smoothing combines back-off smoothing and model interpolation \cite{Jurafsky2009}.
+ Other smoothing techniques that have been applied to n-gram models include: Good-Turing models, Katz back-off models, interpolated models, and modified Kneser-Ney models. Modified Kneser-Ney is generally the preferred smoothing method due to its good performance. These smoothing techniques use knowledge of rarely seen words to estimate counts of unseen words. The Good-Turning approach modifies the counts of word sequences to be more similar to word sequences seen more frequently. The Katz back-off model backs-off to lower order n-gram models for zero-frequency word sequences. Interpolated models interpolate between different order n-gram models. Modified Kneser-Ney smoothing combines back-off smoothing and model interpolation \cite{Jurafsky2009}.
 
 \section{Maximum Entropy  Models}
 \paragraph{}
-\emph{Maximum entropy} models (MaxEnt), also known as multinomial logistic regression models, are linear models often used for classification. They are good at taking in large numbers of different types of features. These features are often hand selected. When used as a language model, MaxEnt models typically use n-grams or skip-grams as features \cite{Mikolov2012}. In a MaxEnt model, each feature gives rise to a constraint that the model must follow. A valid probability distribution produced by an MaxEnt model must conform to all of its constraints. Often there is more than one valid probability distribution, so the distribution with the highest entropy is chosen, generally, using a maximum likelihood estimator. The original MaxEnt language model is described in \cite{Rosenfeld1994}.
+\emph{Maximum entropy} models (MaxEnt), also known as multinomial logistic regression models, are linear models often used for classification. They are good at taking in large numbers of different types of features. These features are often hand selected. When used as a language model, MaxEnt models typically use n-grams or \emph{skip-grams} as features \cite{Mikolov2012}. A skip-gram is an adaptation of n-grams where a number of skipped words are allowed when constructing the n-gram. For a more formal definition of skip-grams see \cite{Guthrie2006}. An n-gram can be thought of as a skip-gram with 0 skips. In a MaxEnt model, each feature gives rise to a constraint that the model must follow. A valid probability distribution produced by an MaxEnt model must conform to all of its constraints. Often there is more than one valid probability distribution, so the distribution with the highest entropy is chosen, generally, using a maximum likelihood estimator. The original MaxEnt language model is described in \cite{Rosenfeld1994}.
 MaxEnt models have the form:
 \begin{align}
 &P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{e^{\sum_i \lambda_i f_i(w_i | w_{i-(n-1)},\dots, w_{i-1})}}{Z(w_{i-(n-1)},
@@ -70,9 +74,9 @@ MaxEnt models have the form:
 \\
 &Z(w_{i-(n-1)},\dots, w_{i-1}) = \sum_{w_i \in V} e^{\sum_i \lambda_i f_i(w_i | w_{i-(n-1)},\dots, w_{i-1})} \nonumber
 \end{align}
-In this formulation, $f_i(w_i | w_{i-(n-1)}$ is a feature, $\lambda_i$ is a weights for that feature, and $Z(w_{i-(n-1)},\dots, w_{i-1})$ is a normalizing constant.
+In this formulation, $f_i(w_i | w_{i-(n-1)})$ is a feature, $\lambda_i$ is a weight for that feature, and $Z$ is the normalizing constant for a given context.
 \paragraph{}
-MaxEnt models perform competitively with other top language models. Chen et al., used a regularized, class-based MaxEnt model, the M model, to achieve a 4\% reduction in perplexity over a 4-gram modified Kneser-Ney model.
+MaxEnt models perform competitively with other top language models. Chen et al., used a regularized, class-based MaxEnt model, the M model, to achieve a 4\% reduction in perplexity over a 4-gram modified Kneser-Ney model \cite{Chen2009}. To put this in context, a 4-gram or 5-gram Kneser-Ney model is the standard for comparison with n-grams.
 \paragraph{}
 
 MaxEnt models can be slow to train and test due to their soft-max formulation which requires normalizing over all words in the vocabulary. A \emph{soft-max} output function produces outputs between 0 and 1, that sum up to 1, and that can be interpreted as probabilities. 
@@ -85,39 +89,39 @@ Neural network based models generalize better than n-grams because neural networ
 
 \subsection{Neural Probabilistic Model}
 \paragraph{}
-The first rigorous application of a neural network to a statistical language model was done by Yoshua Bengio \cite{Bengio2003}. Neural network based models are explored more in \cite{Collobert2008}, and \cite{HuangEtAl2012} . In Bengio's words, his \emph{neural probabilistic model} (NPLM), "learn[s] a distributed representation for words which allows each training sentence to inform the model about an exponential number of semantically neighboring sentences" \cite[pg. 1137]{Bengio2003} The main benefit of NPLM models is that the learned distributed \emph{word feature vectors}, also known as \emph{word embeddings}, generalize to contexts larger than the nearest n-words and also learn representations that account for the semantic and syntactical similarity between words. Similar words have similar word feature vectors, at least, along some dimensions. Word feature vectors have low dimensionality typically between 30 to 100 dimensions. The dimensionality should be much smaller than the size of the vocabulary. In the NPLM model, the word feature vectors and the model are jointly learned. The model is trained using sequences of word feature vectors that correspond to sentences/sequences of words in the training set. The neural network then learns the probability distribution of the next word given the context features by maximizing the log-likelihood of the training data. 
+The first rigorous application of a neural network to a statistical language model was done by Yoshua Bengio \cite{Bengio2003}. Neural network based models are explored more in \cite{Collobert2008}, and \cite{HuangEtAl2012} . In Bengio's words, his \emph{neural probabilistic model} (NPLM), "learn[s] a distributed representation for words which allows each training sentence to inform the model about an exponential number of semantically neighboring sentences" \cite[pg. 1137]{Bengio2003} The main benefit of NPLM models is that the learned distributed \emph{word feature vectors}, also known as \emph{word embeddings}, generalize to contexts larger than the nearest n-words and also learn representations that account for the semantic and syntactical similarity between words. As a consequence, similar words have similar word feature vectors, at least, along some dimensions. Word feature vectors have low dimensionality typically between 30 to 100 dimensions. The dimensionality should be much smaller than the size of the vocabulary. In the NPLM model, the word feature vectors and the model are jointly learned. The model is trained using sequences of word feature vectors that correspond to sentences/sequences of words in the training set. The neural network then learns the probability distribution of the next word given the context features by maximizing the log-likelihood of the training data. 
 The feed-forward NPLM model is given by:
 
 \begin{align}
-&P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = g(x_i) = \frac {e^{b+Wx_i+Utanh(d+Hx_i)}} {\sum_i e^{b+Wx_i+Utanh(d+Hx_i)}} \label{FFNN}
+&P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = g(x_i) = \frac {e^{b+Wx_i+U \tanh(d+Hx_i)}} {\sum_i e^{b+Wx_i+U \tanh(d+Hx_i)}} \label{FFNN}
 \\
-&x_i=\left(C(w_{i-(n-1)}, \dots, C(w_{i-1}) )\right) \nonumber
+&x_i=\left(C(w_{i-(n-1)}), \dots, C(w_{i-1}) \right) \nonumber
 \end{align}
-Where $C$ is a $|V|$ x $m$ matrix that holds the distributed vector representations for each word.  $|V|$ is the size of the vocabulary and $m$ is the number of dimensions of the distributed vector representation. $C(w_{n-1}), \dots, C(w_{t-n+1})$ are contexts with an individual $C$ matrix for each of $n$ context words. $n$ is normally on the order of 2 to 10. The $g$ function is a neural network, either a parameterized feed-forward or recurrent neural network. 
-"The free parameters of the model are the output biases b (with $|V|$ elements), the hidden layer biases $d$ (with $h$ elements), the hidden-to-output weights $U$ (a $|V|$ x $h$ matrix), the word features to output weights $W$ (a $|V|$ x $(n-1)m$ matrix), the hidden layer weights $H$ (a $h$ x $(n-1)m$ matrix), and the word features $C$ (a $|V|$ x $m$ matrix)" \cite[pg. 1143]{Bengio2003}.
+Where $C$ is a $|V|\times m$ matrix that holds the distributed vector representations for each word.  $|V|$ is the size of the vocabulary and $m$ is the number of dimensions of the distributed vector representation. $C(w_{n-1}), \dots, C(w_{t-n+1})$ are contexts with an individual $C$ matrix for each of $n$ context words. $n$ is normally between 2 to 10. The $g$ function is a neural network, either a parameterized feed-forward or recurrent neural network. 
+"The free parameters of the model are the output biases b (with $|V|$ elements), the hidden layer biases $d$ (with $h$ elements), the hidden-to-output weights $U$ (a $|V| \times h$ matrix), the word features to output weights $W$ (a $|V| \times (n-1)m$ matrix), the hidden layer weights $H$ (a $h \times (n-1)m$ matrix), and the word features $C$ (a $|V| \times m$ matrix)" \cite[pg. 1143]{Bengio2003}.
 \paragraph{}
 Note the non-linearity introduced by the hyperbolic tangent in the model. This non-linearity is a key feature of neural network models.
 \paragraph{}
-The model parameters are trained by stochastic gradient ascent using \emph{backpropagation} to maximize the regularized log likelihood. 
+The model parameters are trained by stochastic gradient ascent using \emph{backpropagation} to maximize the regularized log likelihood. Backpropogation is described in Section \ref{sec:FFNNRNN}.
 \paragraph{}
 The NPLM model generalizes well as the model maps similar input vectors to similar outputs. Unknown words that occur in similar contexts as training words will have similar distributed vector representations. The unknown words will therefore have probabilities close to the known words.  Due to this, the NPLM model performs very well in comparison to other top language models. Bengio's model performed 24\% better in terms of perplexity on the Brown corpus and 8\% better on the AP News corpus compared to a 5-gram modified Kneser-Ney model.
 \paragraph{}
 Unfortunately, NPLM models are slow to train and test, again due to the normalization over all words in the vocabulary needed in the soft-max function. Bengio's NPLM model took over 3 weeks to train 5 epochs using 40 CPUs on the AP News corpus which has a vocabulary size of $|V|=16,383$, which is small in comparison to modern corpuses.
 
-\subsection{Feed Forward and Recurrent Neural Network Models}
+\subsection{Feed Forward and Recurrent Neural Network Models} \label{sec:FFNNRNN}
 \paragraph{}
 The \emph{feed forward neural network model} (FFNN) was originally proposed by Yoshua Bengio in \cite{Bengio2003}. The FFNN is the neural network used in the NPLM. Tom{\'a}\v{s} Mikolov proposes a simpler architecture in \cite{Mikolov2009}.
 
 \paragraph{}
-The FFNN model is formulated as above in equation \ref{FFNN}. The FFNN model takes \emph{one-hot} word vectors (only the dimension corresponding to the word is 1, all other dimensions are 0) and projects the vectors down to a much smaller hidden layer which clusters words together. The hidden layer is then introduced to a non-linear activation function such as a hyperbolic tangent or sigmoid function. Lastly, the hidden layer is projected back up to the word vector size and run though a soft-max function to produce word probabilities. The FFNN model is trained using \emph{backpropagation}. Backpropagation is a two-step algorithm with a forward and backward pass. In the forward pass, the algorithm uses the parameters to compute the outputs. On the backward pass, the output errors are propagated backwards into the parameters with respect to the amount of error each parameter is responsible for. Backpropagation is described in \cite{Bengio2003}.
+The FFNN model is formulated as above in Equation \ref{FFNN}. The FFNN model takes \emph{one-hot} word vectors (only the dimension corresponding to the word is 1, all other dimensions are 0) and projects the vectors down to a much smaller hidden layer which clusters words together. The hidden layer is then introduced to a non-linear activation function such as a hyperbolic tangent or sigmoid function. Lastly, the hidden layer is projected back up to the word vector size and run though a soft-max function to produce word probabilities. The FFNN model is trained using \emph{backpropagation}. Backpropagation is a two-step algorithm with a forward and backward pass. In the forward pass, the algorithm uses the parameters to compute the outputs. On the backward pass, the output errors are propagated backwards into the parameters with respect to the amount of error each parameter is responsible for. Backpropagation is described in \cite{Bengio2003}.
 
 \paragraph{}
 The \emph{recurrent neural network model} (RNN) is similar to a FFNN model except that it uses an essentially infinite history. The FFNN model, on the other hand, is only informed about the last $n-1$ words. A RNN model learns a representation of all previous history. The model is called a recurrent neural network, because it feeds its own output back in as an input, like a recursive function. The RNN model is trained by maximizing the log likelihood using \emph{backpropagation though time}. Backpropagation though time is a training algorithm similar to backpropagation. Instead of having an RNN with one hidden layer used $n$ times, backpropagation through time unfolds the RNN model into a FFNN model with $n$ hidden layers, and then applies straightforward backpropogation. The backpropagation through time procedure is described in \cite{Mikolov2012}.
 
 \begin{figure}
 \centering
-\includegraphics[height=300px]{./images/rnn.png}
-\caption{Simple Recurrent Network \cite[pg. 34]{Mikolov2012}}
+\includegraphics[height=300px,trim=100 380 100 30,clip=true]{./images/rnn_pdf.pdf}
+\caption{Simple Recurrent Network \cite[pg. 34]{Mikolov2012}.}
 \label{fig:RNNfigure}
 \end{figure}
 
@@ -131,20 +135,20 @@ The RNN model is formulated:
 \\ 
 &softmax(x_m) = \frac{e^{x_m} }{ \sum_i e^{x_i} }  \nonumber
 \end{align}
-Where $w(t)$ is a one-hot representation of the word, $U$ and $W$ hold the matrix parameters between the input and hidden layer, and $V$ is the matrix holding parameters between the hidden and output layer. Refer to figure \ref{fig:RNNfigure}.
+Where $w(t)$ is a one-hot representation of the word, $U$ and $W$ hold the matrix parameters between the input and hidden layer, and $V$ is the matrix holding parameters between the hidden and output layer. Refer to Figure \ref{fig:RNNfigure}.
 
 \paragraph{}
-The class-based RNN language model by Mikolov \cite{Mikolov2012} currently has state-of-the art performance. The dynamically evaluated interpolated RNNME model has 44.19\% reduction in perplexity and 11.8\% reduction in entropy compared to a 5-gram modified Kneser-Ney model on the Penn Treebank.
+The class-based RNN interpolated with the Recurrent Neural Network Maximum Entropy language model by Mikolov \cite{Mikolov2012} currently has state-of-the-art performance. The dynamically evaluated interpolated model has 44.19\% reduction in perplexity and 11.8\% reduction in entropy compared to a 5-gram modified Kneser-Ney model on the Penn Treebank.
 \paragraph{}
 Mikolov states that "[r]oughly speaking, we can reduce training times from many weeks to a few days by using the novel RNN architecture" on $400$ million tokens and with $|V|=82,000$ \cite[pg. 93]{Mikolov2012}. 
 
-\subsection{Log Bilinear Model} \label{sec:lbl}
+\subsection{Log-Bilinear Model} \label{sec:lbl}
 \paragraph{}
 The \emph{log-bilinear model} (LBL) is a simple neural network based model. Andriy Mnih and Geoffrey Hinton introduce the LBL model in \cite{MnihHinton2007}. Unlike a typical neural model, the LBL model has no non-linearities introduced except for the soft-max output function. By having no non-linearities, LBL models are much easier to understand. The target word representation can always be linearly decomposed into its constituent context word representations. Unfortunately, this means the LBL model cannot capture non-linear phenomena in its representations. Like other neural models, the LBL model still has the benefit of learning distributed vector word representations for both the input and output words.  The LBL model computes a prediction vector for the next word from a linear combination of the context word vectors. This prediction vector is then compared to the actual target word vector using an unnormalized cosine similarity function. The measure of similarity between these vectors is then run through the soft-max function to give a conditional word probability.
 
 The LBL model is formulated:
 \begin{align}
-P(w_i | w_{i-(n-1)},\dots, w_{i-1})  =& \frac{ exp( \hat{r}^T q_{w_i} +b_{w_i}) } { \sum_j exp( \hat{r}^T q_{w_j} +b_{w_j})} \label{eq:LBL}
+P(w_i | w_{i-(n-1)},\dots, w_{i-1})  =& \frac{ \exp( \hat{r}^T q_{w_i} +b_{w_i}) } { \sum_j \exp( \hat{r}^T q_{w_j} +b_{w_j})} \label{eq:LBL}
 \\ 
 \hat{r} =& \sum_{i=1}^{n-1} C_i r_{w_i} \nonumber
 \end{align} 
@@ -153,7 +157,7 @@ Where $r_{w_i}$ is the vector representation for context word $w_i$ and $q_{w_i}
 \paragraph{}
 The model is trained using stochastic gradient ascent to maximize the log likelihood. The training is described in \cite{MnihHinton2007}.
 \paragraph{}
-Mnih and Hinton report a 5.3\% perplexity improvement with respect to the back off Kneser Ney 5-gram model on the AP News dataset with 14 million training tokens and $|V|$=17964. The LBL model is relatively fast for a neural model as it has no non-linearities to compute, though again suffers from the soft-max normalization. 
+Mnih and Hinton report a 5.3\% perplexity improvement with respect to the back off Kneser-Ney 5-gram model on the AP News dataset with 14 million training tokens and $|V|$=17,964. The LBL model is relatively fast for a neural model as it has no non-linearities to compute, though again suffers from the soft-max normalization. 
 
 \section {Extensions to Language Models}
 \subsection{Interpolated Models}
@@ -161,7 +165,7 @@ Mnih and Hinton report a 5.3\% perplexity improvement with respect to the back o
 Combining models can result in a better model. A interpolated model linearly interpolates word probabilities generated by two or more models trained on the same data. The weight on each constituent model is hand-tweaked or learned. The interpolated model benefits from all the constituent models that may have learned different features of the language.
 \subsection{Cached Models}
 \paragraph{}
-Words that are rare in a language may be frequent in an individual document. For example, "kettlebell" may be a rare word in the English language but may be common in an exercise article. To deal with this phenomenon, cache models are used. The original model is proposed in \cite{Kuhn1990}. The basic idea is to train two models, a normal language model, and a second model on a small portion of the training/test set that corresponds to the document in question. The two models are then interpolated to get a cache model. The intuition is that rare words that are common in the document will be cached in the second model, while the first model will deal with the rest of the language.
+Words that are rare in a language may be frequent in an individual document. For example, "kettlebell" may be a rare word in the English language but may be common in an exercise article. To deal with this phenomenon, cache models are used. The original model is proposed in \cite{Kuhn1990}. The basic idea is to train two models, a normal language model, and a second model on a small portion of the training/test set that corresponds to the document in question. The~two models are then interpolated to get a cache model. The intuition is that rare words that are common in the document will be cached in the second model, while the first model will deal with the rest of the language.
 
 \section {Evaluation of Language Models}
 \paragraph{}
@@ -171,7 +175,7 @@ Given different models, we need a way to compare their performance. One standard
 \emph{Perplexity} (PP) can be thought of as a measure of how "perplexed" the model is by a test set.
 Perplexity is given by:
 \begin{align}
-PP(w_i | h_i)=e^{- \frac{1}{K} \sum_{i=1}^K ln( P(w_i | h_i) ) } \label{eq:perplexity}
+PP(w_i | h_i)=e^{- \frac{1}{K} \sum_{i=1}^K \ln( P(w_i | h_i) ) } \label{eq:perplexity}
 \\ h_i = ( w_{i-(n-1)},\dots, w_{i-1} ) \nonumber
 \end{align}
 Where $K$ is the number of testing examples. 

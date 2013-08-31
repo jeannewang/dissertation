@@ -1,8 +1,8 @@
 \chapter{Related Work}
 \paragraph{}
-The biggest limitation of neural based language models is their slow training and testing. There has been a lot of work in the field dedicated to speeding up neural based-models. Methods that have been used to speed up such models include creating class-based models, creating tree-based models, using gradient approximation, truncating the vocabulary, using diagonal context matrices, and changing the training order.
+The biggest limitation of neural based language models is their slow training and testing. Subsequently, there has been a lot of work in the field dedicated to speeding up neural based-models. Methods that have been used to speed up such models include creating class-based models, creating tree-based models, using gradient approximation, truncating the vocabulary, using diagonal context matrices, and changing the training order.
 \paragraph{}
-The slowest part of neural models tends to be the soft-max normalization used in the output function, due to the normalization over a large vocabulary size. Large vocabulary sizes also affect the time to calculate the expectation component of the objective function gradient. In addition to vocabulary size ($|V|$), other factors that affect training times include: number of training iterations($I$), number of training tokens ($W$), number of hidden layers (H), context-size ($N$), and word representation dimensionality ($D$). Neural network model training takes on the order of $O\left( I \times W \times \left( (N-1) \times D \times H +  |V| \times H \right) \right)$ computations \cite{Mikolov2012}. The vocabulary size and number of training tokens are by far the largest contributors to the training time. Given that we would like to train on as many examples as possible, $W$ should not be reduced. This leaves $|V|$ as the main component we should focus on reducing. Note, that the training complexity is linear in the size of the vocabulary.
+The slowest part of neural models tends to be the soft-max normalization used in the output function, due to the normalization over a large vocabulary. Large vocabulary sizes also affect the time to calculate the expectation component of the objective function gradient. In addition to vocabulary size ($|V|$), other factors that affect training times include: number of training iterations ($I$), number of training tokens ($W$), number of hidden layers (H), context-size~($N$), and word representation dimensionality ($D$). Neural network model training takes on the order of $O\left( I \times W \times \left( (N-1) \times D \times H +  |V| \times H \right) \right)$ computations \cite{Mikolov2012}. The vocabulary size and number of training tokens are by far the largest contributors to the training time. Given that we would like to train on as many examples as possible, $W$ should not be reduced. This leaves~$|V|$ as the main component we should focus on reducing. Note, that the training complexity is linear in the size of the vocabulary.
 The methods described below try to speed up one or more of the contributors to the training complexity. Though these methods are explored for a single model, the ideas can be applied to speed up other models.
 \section{Class based model}
 \paragraph{}
@@ -18,32 +18,32 @@ The probability of a word is given by:
 P(w_i | h_i)  =&  P(class(w) | h_i) \times P(w|  h_i, class(w))
 \\ h_i =& ( w_{i-(n-1)},\dots, w_{i-1} ) \nonumber
 \end{align}
-The constituent probabilities $P(class(w) | h_i)$ and $P(w|  h_i, class(w))$ are predicted using two separate MaxEnt models. The MaxEnt formulation is given by equation \ref{eq:maxent}. The MaxEnt model uses a soft-max output function which normalizes over all words in the vocabulary.
+The constituent probabilities $P(class(w) | h_i)$ and $P(w|  h_i, class(w))$ are predicted using two separate MaxEnt models. The MaxEnt formulation is given by Equation \ref{eq:maxent}. The MaxEnt model uses a soft-max output function which normalizes over all words in the vocabulary.
 \paragraph{}
 The idea is to limit the number of possible outputs, which is the same as limiting the effective size of the vocabulary. By first selecting a class, the word probability can be normalized over the class size instead of the vocabulary size. If the words are distributed uniformly across 100 classes, then the first normalization will be over 100 (for the classes) and the second normalization will occur over $\frac{1}{100}$th the vocabulary size (for the word). This can drastically reduce training times. For example if there are 10,000 words in the vocabulary, there will be two normalizations over 100, with time proportional to 200. The normal soft-max output would normalize over the entire vocabulary in time proportional to 10,000. In this case, there is a 98\% reduction in training time. In general there will be an order $O(\sqrt{|V|})$ speedup.
 \paragraph{}
-Goodman also suggested using additional prediction levels, though he found that more than three levels did not lead to large improvements. In a three level system such as figure \ref{fig:3class}, for the word \emph{dog}, a model might first predict the super-class \emph{noun}, then predict the class \emph{animal}, and finally predict the word \emph{dog}. The classes and super-classes are generally semantic or lexical classes and are generated by clustering based on some similarity metric.
+Goodman also suggested using additional prediction levels, though he found that more than three levels did not lead to large improvements. In a three level system such as Figure \ref{fig:3class}, for the word \emph{dog}, a model might first predict the super-class \emph{noun}, then predict the class \emph{animal}, and finally predict the word \emph{dog}. The classes and super-classes are generally semantic or lexical classes and are generated by clustering based on some similarity metric.
 \subsection{Frequency-binned classes} \label{sec:frequencybinning}
 \paragraph{}
 Instead of using classes that are semantically or lexically motivated, frequency-binned classes can also be used. Words can be assigned to classes based on their relative frequency. This would still have the speed advantage of the class-based structure but would remove the overhead of creating "smart" classes. Though frequency binning is very easy to implement, the loss of "smart" classes, does have negative effects on the model performance. With a semantic class based system, words in the same class will be semantically similar. Therefore if the wrong word is predicted for a particular class, at least the predicted word will be similar to the correct word. With frequency binning, an incorrectly selected word could be very semantically different. Even so, Mikolov in \cite{Mikolov2012} claims frequency-binned classes work well. 
 
 \section{Tree based model}
 \paragraph{}
-One method to speed up the training and testing of neural models language models is to arrange the vocabulary into a decision tree structure. This way, each word becomes a series of decisions through the tree. The number of decisions is order $O(log|V|)$.
+One method to speed up the training and testing of neural models language models is to arrange the vocabulary into a decision tree structure. This way, each word becomes a series of decisions through the tree. The number of decisions is order $O(\log|V|)$.
 
 \subsection{Hierarchical Neural Network Language Model}
 \paragraph{}
-The \emph{hierarchical neural probabilistic language model} (HNPLM) is introduced by Frederic Morin and Yoshua Bengio in \cite{MorinBengio2005}. This idea extends the class-based method proposed by Goodman. Compared to a class-based method,  a hierarchical method extends the number of prediction class levels, and also limits the number of elements in each class. If we take this idea almost to the limit, we end up with $log_2(|V|)$ class levels and 2 elements in each class. As described in \cite{MorinBengio2005}, the hierarchy is represented by a balanced binary tree where each node represents a class with two constituents.  A word probability is then the product of all conditional class probabilities on the path through the tree to the word node as below:
+The \emph{hierarchical neural probabilistic language model} (HNPLM) is introduced by Frederic Morin and Yoshua Bengio in \cite{MorinBengio2005}. This idea extends the class-based method proposed by Goodman. Compared to a class-based method,  a hierarchical method extends the number of prediction class levels, and also limits the number of elements in each class. If we take this idea almost to the limit, we end up with $\log_2(|V|)$ class levels and 2 elements in each class. As described in \cite{MorinBengio2005}, the hierarchy is represented by a balanced binary tree where each node represents a class with two constituents.  A word probability is then the product of all conditional class probabilities on the path through the tree to the word node as below:
 \begin{align}
 &P(w_i | w_{i-(n-1)},\dots, w_{i-1})  =  \prod_{j=1}^{k} P(b_j(w_i)|node_j ,  w_{i-(n-1)},\dots, w_{i-1})
 \\
-&P(b_j(w_i)=1|node_j,  w_{i-(n-1)},\dots, w_{i-1}) =  \sigma(\alpha_{node_j} + \beta' . tanh(c+ Wx+ UN_{node_j})) \label{eq:hplm_sig}
+&P(b_j(w_i)=1|node_j,  w_{i-(n-1)},\dots, w_{i-1}) =  \sigma(\alpha_{node_j} + \beta' \tanh(c+ Wx+ UN_{node_j})) \label{eq:hplm_sig}
 \\
 &node_j =b_1(w_i),\dots,b_{j-1}(w_i) \nonumber
 \\ 
-&\sigma(x) = \frac{1}{1+exp(-x)} \nonumber
+&\sigma(x) = \frac{1}{1+\exp(-x)} \nonumber
 \end{align}
-Where $b_j(w_i)$ is the binary decision for word $w_i$ at node $j$. $k$ is the length of the path through the tree for word $w_i$, and $node_j$ is the sequence of bits specifying node $j$. As we can see from equation \ref{eq:hplm_sig}, Morin's hierarchical setup is applied to the neural probabilistic model described in section \ref{sec:nplm}. Also, the soft-max is replaced by the sigmoid function which plays the same output function role except the normalization occurs over only two outputs.
+Where $b_j(w_i)$ is the binary decision for word $w_i$ at node $j$. $k$ is the length of the path through the tree for word $w_i$, and $node_j$ is the sequence of bits specifying node $j$. As we can see from Equation \ref{eq:hplm_sig}, Morin's hierarchical setup is applied to the neural probabilistic model described in Section \ref{sec:nplm}. Also, the soft-max is replaced by the sigmoid function which plays the same output function role except the normalization occurs over only two outputs.
 
 \begin{figure}
 \Tree [.$N_0$ [.$N_1$ {duck}  {rabbit} ] [.$N_2$ {dog} {squirrel} ]  ]
@@ -52,20 +52,20 @@ Where $b_j(w_i)$ is the binary decision for word $w_i$ at node $j$. $k$ is the l
 \end{figure}
 
 \paragraph{}
-The tree used in \cite{MorinBengio2005} is created using expert knowledge from WordNet. The tree is a balanced tree that guarantees each branch is of length $log_2(|V|)$. This means that each word can now be predicted with $log_2(|V|)$ normalizations over two words. This is in comparison to the standard NPLM model which has a single normalization over $|V|$ words. For a 10,000 word vocabulary, per word, the HNPLM make $14$ binary decisions, with time proportional to 28. The NPLM, on the other hand, takes time proportional to 10,000. In this example, we see a 99.72\% reduction in time. The hierarchical set up in general produces an order $O(\frac{|V|}{log(|V|)})$ speedup.
+The tree used in the HNPLM is created using expert knowledge from WordNet \cite{MorinBengio2005}. The tree is a balanced tree that guarantees each branch is of length $\log_2(|V|)$. This means that each word can now be predicted with $\log_2(|V|)$ normalizations over two outcomes. This is in comparison to the standard NPLM model which has a single normalization over $|V|$ words. For example, using a 10,000 word vocabulary the HNPLM make $14$ binary decisions per word. Each decision is over 2 outcomes, for a total of 28 expressions to consider in the normalization. The NPLM, on the other hand has to consider 10,000 expressions for normalization per word. The total time is proportional to the number of expressions normalized over. In this example, we see a 99.72\% reduction in time. The hierarchical set up in general produces an order $O(\frac{|V|}{\log(|V|)})$ speedup.
 
 \paragraph{}
-The word itself can also be represented by a binary code corresponding to decisions through the tree. Going left in the tree corresponds to $0$ and going right in the tree corresponds to $1$. For example, in figure \ref{fig:htree}, the word \emph{dog} would correspond to the code $10$.
+The word itself can also be represented by a binary code corresponding to decisions through the tree. Going left in the tree corresponds to $0$ and going right in the tree corresponds to $1$. For example, in Figure \ref{fig:htree}, the word \emph{dog} would correspond to the code $10$.
 
 \paragraph{}
-Morin and Bengio found that the HNPLM produces a slightly less accurate model than the original NPLM but with a 250 $\times$ speedup. On the Brown corpus, with $|V|$=10,000 and a $900,000$ token training set, the NPLM had a test perplexity of 195.3 whereas the HNPLM had a test perplexity of 220.7.
+Morin and Bengio found that the HNPLM produces a less accurate model than the original NPLM but with a $250\times$ speedup. On the Brown corpus, with $|V|$=10,000 and a 900,000 token training set, the NPLM had a test perplexity of 195.3 whereas the HNPLM had a test perplexity of 220.7.
 
-\subsection{Hierarchical Log Bilinear Model} \label{sec:HLBL}
+\subsection{Hierarchical Log-Bilinear Model} \label{sec:HLBL}
 \paragraph{}
-Andriy Mnih and Geoffry Hinton the originators of the log bilinear model, which is described in section \ref{sec:lbl},  also explored a faster model: the \emph{hierarchical log bilinear model} (HLBL). This dissertation is based off of the HLBL work done by Mnih and Hinton. 
+Andriy Mnih and Geoffry Hinton the originators of the log-bilinear model, which is described in Section \ref{sec:lbl},  also explored a faster model: the \emph{hierarchical log-bilinear model} (HLBL). This dissertation is based off of the HLBL work done by Mnih and Hinton. 
 
 \paragraph{}
-The HLBL model is described in \cite{MnihHinton2009}. This model uses a tree-based structure to reduce the number of normalizations needed in the LBL model. The speed-up idea is the same as in the HNPLM and also results in a $O(\frac{|V|}{log|V|})$ speedup.
+The HLBL model is described in \cite{MnihHinton2009}. This model uses a tree-based structure to reduce the number of normalizations needed in the LBL model. The speed-up idea is the same as in the HNPLM and also results in a $O(\frac{|V|}{\log|V|})$ speedup. I am choosing to use the HLBL because it directly affects the effective vocabulary component of the training and test times. Since the vocabulary is the largest contributor to the training and test times, reducing the effective vocabulary size should be very good at speeding up the entire model.
 
 \paragraph{}
 The formulation is similar to the LBL model. The key difference is that the word probability is now a product of binary probabilities instead of a single soft-max output. Also, there is no longer a separate representation for target words, instead we have representations for nodes in the binary tree.
@@ -79,14 +79,16 @@ The formulation is similar to the LBL model. The key difference is that the word
 Where $b_j(w_i)$ is the binary decision for word $w_i$ at node $j$. $q_j$ is the vector representation for node $j$, and $b_{j}$ is a bias term for node $j$. $r_{w_i}$ is the vector representation for context word $w_i$, and $C_i$ is the matrix that corresponds to the interaction between the $i$th context word and the target node.  $\hat{r}$ can still be thought of as a prediction vector for $w_i$. 
 
 \paragraph{}
-Much of the hierarchical formulation, intuition, and speed-up is the same as the HNPLM for the HLBL. The major difference between the two is that the HNPLM has non-linearities introduced whereas the HLBL is linear. This makes the HLBL faster as it does not need to compute non-linearities. Additionally, the prediction vector $\hat{r}$ in the HLBL can be predicted once per word, whereas the full non-linearity must be computed per node for the HNPLM. One other difference is that the HNPLM conditions off of all previous binary decisions, whereas the HLBL treats each binary decision independently, which is a simplifying assumption. I am choosing to use the HLBL because it directly affects the effective vocabulary component of the training and test times. Since the vocabulary is the largest contributor to the training and test times, reducing the effective vocabulary size should be very good at speeding up the entire model.
+Much of the hierarchical formulation, intuition, and speed-up is the same as the HNPLM for the HLBL. The major difference between the two is that the HNPLM has non-linearities introduced whereas the HLBL is linear. This makes the HLBL faster as it does not need to compute non-linearities. Additionally, the prediction vector $\hat{r}$ in the HLBL can be predicted once per word, whereas the full non-linearity must be computed per node for the HNPLM. One other difference is that the HNPLM conditions on all previous binary decisions, whereas the HLBL treats each binary decision independently, which is a simplifying assumption. 
 
 \paragraph{}
-The biggest contribution from \cite{MnihHinton2009} is  Mnih and Hinton's exploration of using various types of trees. Mnih and Hinton showed that different types of binary trees influence both model performance and speed. The trees explored included random trees, \emph{BALANCED} trees, \emph{ADAPTIVE} trees, \emph{ADAPTIVE($\epsilon$)}, and overcomplete trees. The creation of such trees is described in \cite{MnihHinton2009}.
+The biggest contribution from \cite{MnihHinton2009} is  Mnih and Hinton's exploration of using various types of trees. Mnih and Hinton showed that different types of binary trees influence both model performance and speed. The trees explored included random trees, \emph{BALANCED} trees, \emph{ADAPTIVE} trees, \emph{ADAPTIVE($\epsilon$)}, and overcomplete trees. The creation of such trees is described in~\cite{MnihHinton2009}.
 The trees were all created similarly by first training a HLBL using a random tree, and then clustering on the trained average prediction vectors $\bar{\hat{r}}$, which were treated as word representations. The clustering algorithm used was a \emph{mixture of two gaussians}. Both gaussians assigned responsibilities to each word representation. The BALANCED algorithm made splits to maintain a balanced tree, whereas the ADAPTIVE algorithm made splits based on which cluster had a higher responsibility for the word. The ADAPTIVE($\epsilon$) algorithm added the word representation to both clusters if both clusters had responsibilities within $\epsilon$ of 0.5. Clustering was run recursively until a full binary tree was built. 
 
-The last trees explored were $2\times$ and $4\times$ overcomplete ADAPTIVE($\epsilon=.4$) trees. A $2 \times$ overcomplete tree has two ADAPTIVE($\epsilon$) subtrees and a $4\times$ overcomplete tree has four such subtrees. 
+\paragraph{}
+The last trees explored were $2\times$ and $4\times$ overcomplete ADAPTIVE($\epsilon=0.4$) trees. A~$2\times$~overcomplete tree has two ADAPTIVE($\epsilon$) subtrees and a $4\times$ overcomplete tree has four such subtrees. 
 
+\paragraph{}
 For the ADAPTIVE($\epsilon$) and overcomplete trees, the same word may have multiple codes. The probability of such words must be the sum over all code instances.
 \begin{align}
 P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \sum_{b \in B(w_i)} \prod_j P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})
@@ -94,7 +96,7 @@ P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \sum_{b \in B(w_i)} \prod_j P(b_j(w_i) | q
 Where $B(w_i)$ is the set of all codes for word $w_i$.
 
 \paragraph{}
-The best-performing HLBL models with various trees in order were : overcomplete, ADAPTIVE($\epsilon$), ADAPTIVE, BALANCED and random. The standard LBL model performance fell somewhere between ADAPTIVE($\epsilon$) trees and overcomplete trees. All of the HLBL models (using various trees) were at least $200\times$ faster than the LBL model. 
+The HLBL models with various trees in decreasing order of performance are: overcomplete, ADAPTIVE($\epsilon$), ADAPTIVE, BALANCED and random. The standard LBL model performance fell somewhere between ADAPTIVE($\epsilon$) trees and overcomplete trees. All of the HLBL models (using various trees) were at least $200\times$ faster than the LBL model. 
 The key takeaway is that the type of tree used makes a difference. Trees with multiple branches for difficult words can perform better than the standard LBL model and can also be faster.
 
 \section{Gradient Approximation}
@@ -108,18 +110,18 @@ The idea behind importance sampling is to approximate the negative contribution 
 
 The normal gradient is computed:
 \begin{align}
-\frac{\partial}{\partial \theta} log P_{\theta}(w_i| h_i) =& \frac{\partial}{\partial \theta} \hat{r} - \sum_i P_{\theta}(w_i| h_i) \frac{\partial}{\partial \theta} \hat{r_i} 
-\\ \frac{\partial}{\partial \theta} log P_{\theta}(w_i| h_i) =& \frac{\partial}{\partial \theta} \hat{r} - E_{P_{\theta}(w_i| h_i)} \left[ \frac{\partial}{\partial \theta} \hat{r} \right] \nonumber
+\frac{\partial}{\partial \theta} \log P_{\theta}(w_i| h_i) =& \frac{\partial}{\partial \theta} \hat{r} - \sum_i P_{\theta}(w_i| h_i) \frac{\partial}{\partial \theta} \hat{r_i} 
+\\ \frac{\partial}{\partial \theta} \log P_{\theta}(w_i| h_i) =& \frac{\partial}{\partial \theta} \hat{r} - E_{P_{\theta}(w_i| h_i)} \left[ \frac{\partial}{\partial \theta} \hat{r} \right] \nonumber
 \end{align}
 
 Importance sampling tries to avoid computing the expectation $E_{P_{\theta}(w_i| h_i)} \left[ \frac{\partial}{\partial \theta} \hat{r} \right]$ as this requires computing $\hat{r}$ for every word in the vocabulary. Instead the gradient is estimated using:
 
 \begin{align}
-&\frac{\partial}{\partial \theta} log P_{\theta}(w_i| h_i) \approx  \frac{\partial}{\partial \theta} \hat{r} - \frac{1}{M} \sum_{j=1}^k m(x_j) \frac{\partial}{\partial \theta} \hat{r}
-\\ &m(x) =  \frac{exp(\hat{r})}{Q^{h_i}(w_i=x)} \nonumber
+&\frac{\partial}{\partial \theta} \log P_{\theta}(w_i| h_i) \approx  \frac{\partial}{\partial \theta} \hat{r} - \frac{1}{M} \sum_{j=1}^k m(x_j) \frac{\partial}{\partial \theta} \hat{r}
+\\ &m(x) =  \frac{\exp(\hat{r})}{Q^{h_i}(w_i=x)} \nonumber
 \\ &M= \sum_{j=1}^k m(x_j) \nonumber
 \end{align}
-$k$ is the number of samples taken from $Q^h_i(w_i)$, and $x_j$ is a sample from  $Q^h_i(w_i)$. If $k << |V|$ then importance sampling can be much faster than calculating the gradient.
+where $k$ is the number of samples taken from $Q^h_i(w_i)$, and $x_j$ is a sample from  $Q^h_i(w_i)$. If $k \ll |V|$ then importance sampling can be much faster than calculating the gradient.
 
 \paragraph{}
 Unfortunately, the number of samples $k$ must grow as training progresses to account for the growing variance between the $Q^h_i(w_i)$ distribution and the actual distribution. 
@@ -133,26 +135,25 @@ Andriy Mnih and Yee Whye Teh use \emph{Noise-Contrastive Estimation} (NCE) for t
 The basic idea in NCE is to discriminate between samples from the actual word distribution and a known noise distribution. In \cite{MnihTeh2012}, a unigram distribution is used for the noise distribution.
 The objective function $J$ in NCE is:
 \begin{align}
-J^h(\theta) = E_{P_d^h} \left[ log \frac { P_{\theta}^h(w) } {P_{\theta}^h(w) + k P_n(w)} \right] + kE_{P_n} \left[ log \frac { k P_n(w) } {P_{\theta}^h(w) + k P_n(w)} \right]
+J^h(\theta) = E_{P_d^h} \left[ \log \frac { P_{\theta}^h(w) } {P_{\theta}^h(w) + k P_n(w)} \right] + kE_{P_n} \left[ \log \frac { k P_n(w) } {P_{\theta}^h(w) + k P_n(w)} \right]
 \end{align}
 where $P_{\theta}^h(w)$ is the actual word distribution and $P_n(w)$ is the known noise distribution. The noise samples are $k$ times more frequent than the word samples.
 
 The gradient can then be calculated:
 \begin{align}
 \frac{\partial}{\partial \theta} J^{h,w}(\theta) = \frac {  k P_n(w)  } {P_{\theta}^h(w) + k P_n(w)}  \frac{\partial}{\partial \theta}  P_{\theta}^h(w)
-- \sum_{i=1}^{k} \left[ log \frac { P_{\theta}^h(x_i) } {P_{\theta}^h(x_i) + k P_n(x_i)} \frac{\partial}{\partial \theta} log P_{\theta}^h(x_i) \right]
+- \sum_{i=1}^{k} \left[ \log \frac { P_{\theta}^h(x_i) } {P_{\theta}^h(x_i) + k P_n(x_i)} \frac{\partial}{\partial \theta} \log P_{\theta}^h(x_i) \right]
 \end{align}
-The NCE gradient formulation's negative contribution is only a sum over $k$ samples, instead of a sum over all words $|V|$ in the vocabulary. If $k << |V|$ then there is a significant speedup over the normal gradient calculation.
+The NCE gradient formulation's negative contribution is only a sum over $k$ samples, instead of a sum over all words $|V|$ in the vocabulary. If $k \ll |V|$ then there is a significant speedup over the normal gradient calculation.
 \paragraph{}
-The NCE speedup should be $O(\frac{nd + |V|} {nd+ k})$ over the normal gradient computation. Where $n$ is the context-size and $d$ is the word-feature dimensionality.
+The NCE speedup should be $O \left(\frac{nd + |V|} {nd+ k} \right)$ over the normal gradient computation. Where $n$ is the context-size and $d$ is the word-feature dimensionality.
 \paragraph{}
 On the Penn Treebank, Mnih and Teh found NCE to be $14\times$ faster than standard Maximum Likelihood (MLE)  training. In \cite{MnihTeh2012}, it is reported that with enough samples, NCE can actually perform slightly better than MLE training on the Penn Treebank. Unfortunately, the better performance is probably due to noise or implicit regularization in NCE training. NCE training should not generally perform better than MLE training.
 
 
 \section{Vocabulary Truncation}
 \paragraph{}
-One easy way to reduce the training and testing time, is to simply reduce the number of words. By reducing the vocabulary size, the normalization and expectation over the vocabulary becomes faster. Unfortunately the words that are generally truncated tend to be the least frequent words, which also tend to be the most interesting words for a language model to learn.
-
+One easy way to reduce the training and testing time, is to simply reduce the number of words. By reducing the vocabulary size, the normalization and expectation over the vocabulary becomes faster. Unfortunately the words that are generally truncated tend to be the least frequent words, which also tend to be the most interesting words for a language model to learn. 
 \section{Diagonal Context Matrices}
 \paragraph{}
 Mnih and Hinton propose diagonal context matrices in \cite{MnihHinton2009}. Neural language models tend to have context matrices $C_i$ that capture the behavior of the context. These context matrices are of size $D \times D$, where $D$ is the dimensionality of the word embeddings. Context matrices are used in computing everything from the objective function to the gradient, so having a smaller context matrix can speedup training and testing of the whole model. One way of having a smaller context matrix is to diagonalize the matrix, so there are effectively only $D$ values in $C_i$. This makes matrix multiplication with $C_i$ faster. Note that this does reduce the representational power of large contexts. Also, the size of $C_i$ is generally much smaller than the size of $|V|$, so reducing $C_i$ will not have a major effect on training times.

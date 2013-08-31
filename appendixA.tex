@@ -5,18 +5,18 @@ We would like to find the gradient to the negative log likelihood with an $L_2$ 
 
 Given:
 \begin{align*}
-&-ln(J(\theta;w_i,\dots, w_m)) = \sum_{i=1}^{m} \sum_j -ln(P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1}))
+&-\ln(J(\theta;w_1,\dots, w_m)) = \sum_{i=1}^{m} \sum_j -\ln(P(d_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1}))
 \\ 
-&-ln(P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) =  
+&-\ln(P(d_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) =  
 \begin{cases}
-  ln (1 + e^{-\hat{r}^T q_{j} -b_{j}}) & \text{if } b_j(w_i)  = 1 \\
-  ln (1 + e^{\hat{r}^T q_{j} +b_{j}})     & \text{if } b_j(w_i) = 0
+  \ln (1 + e^{-\hat{r}^T q_{j} -b_{j}}) & \text{if } d_j(w_i)  = 1 \\
+  \ln (1 + e^{\hat{r}^T q_{j} +b_{j}})     & \text{if } d_j(w_i) = 0
   \end{cases}
 \\
-&P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1}) =  
+&P(d_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1}) =  
 \begin{cases}
-  \sigma(\hat{r}^T q_{j} +b_{j}) & \text{if } b_j(w_i)  = 1 \\
-  \sigma(-\hat{r}^T q_{j} -b_{j})     & \text{if } b_j(w_i) = 0
+  \sigma(\hat{r}^T q_{j} +b_{j}) & \text{if } d_j(w_i)  = 1 \\
+  \sigma(-\hat{r}^T q_{j} -b_{j})     & \text{if } d_j(w_i) = 0
   \end{cases}
 \\
 &\hat{r} = \sum_{i=1}^{n-1} C_i r_{w_i} 
@@ -28,19 +28,19 @@ Given:
 
 We will solve for the gradient:
 \begin{align*}
-&\frac{\partial}{\partial \theta} -ln(J(\theta;w_i,\dots, w_m)) +  \mu ||\theta||^2_2
+&\frac{\partial}{\partial \theta} -\ln(J(\theta;w_1,\dots, w_m)) +  \mu ||\theta||^2_2
 \\
-& \sum_{i=1}^{m} \sum_j \frac{\partial}{\partial \theta} -ln(P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) +\frac{\partial}{\partial \theta}  \mu ||\theta||^2_2
+& \sum_{i=1}^{m} \sum_j \frac{\partial}{\partial \theta} -\ln(P(d_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) +\frac{\partial}{\partial \theta}  \mu ||\theta||^2_2
 \\
-& \sum_{i=1}^{m} \sum_j \frac{\partial}{\partial \theta} -ln(P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) + 2 \mu \theta
+& \sum_{i=1}^{m} \sum_j \frac{\partial}{\partial \theta} -\ln(P(d_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) + 2 \mu \theta
 \end{align*}
 
-When $b_j(w_i)  = 1$:
+When $d_j(w_i)  = 1$:
 \begin{align*}
-& \frac{\partial}{\partial \theta} -ln(P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) 
+& \frac{\partial}{\partial \theta} -\ln(P(d_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) 
 \end{align*}
 \begin{align*}
-&=  \frac{\partial}{\partial \theta} ln (1 + e^{-\hat{r}^T q_{j} -b_{j}})
+&=  \frac{\partial}{\partial \theta} \ln (1 + e^{-\hat{r}^T q_{j} -b_{j}})
 \\
 &= \frac{1}{1 + e^{-\hat{r}^T q_{j} -b_{j}}} \frac{\partial}{\partial \theta}1 + e^{-\hat{r}^T q_{j} -b_{j}}
 \\
@@ -50,15 +50,15 @@ When $b_j(w_i)  = 1$:
 \\
 &= \left( \frac{1}{1 + e^{-\hat{r}^T q_{j} -b_{j}}}  - \frac{1 + e^{-\hat{r}^T q_{j} -b_{j}}}{1 + e^{-\hat{r}^T q_{j} -b_{j}}} \right) \frac{\partial}{\partial \theta}\hat{r}^T q_{j} +b_{j}
 \\
-&= \left( P(b_j(w_i)=1 | q_j, w_{i-(n-1)},\dots, w_{i-1}) - 1 \right) \frac{\partial}{\partial \theta}\hat{r}^T q_{j} +b_{j}
+&= \left( P(d_j(w_i)=1 | q_j, w_{i-(n-1)},\dots, w_{i-1}) - 1 \right) \frac{\partial}{\partial \theta}\hat{r}^T q_{j} +b_{j}
 \end{align*}
 
-When $b_j(w_i)  = 0$:
+When $d_j(w_i)  = 0$:
 \begin{align*}
-& \frac{\partial}{\partial \theta} -ln(P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) 
+& \frac{\partial}{\partial \theta} -\ln(P(d_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1})) 
 \end{align*}
 \begin{align*}
-&=  \frac{\partial}{\partial \theta} ln (1 + e^{\hat{r}^T q_{j} +b_{j}})
+&=  \frac{\partial}{\partial \theta} \ln (1 + e^{\hat{r}^T q_{j} +b_{j}})
 \\
 &= \frac{1}{1 + e^{\hat{r}^T q_{j} +b_{j}}} \frac{\partial}{\partial \theta}1 + e^{\hat{r}^T q_{j} +b_{j}}
 \\
@@ -66,7 +66,7 @@ When $b_j(w_i)  = 0$:
 \\
 &= \frac{1}{1 + e^{-\hat{r}^T q_{j} -b_{j}}}  \frac{\partial}{\partial \theta}\hat{r}^T q_{j} +b_{j}
 \\
-&= \left( P(b_j(w_i)=1 | q_j, w_{i-(n-1)},\dots, w_{i-1}) - 0 \right) \frac{\partial}{\partial \theta}\hat{r}^T q_{j} +b_{j}
+&= \left( P(d_j(w_i)=1 | q_j, w_{i-(n-1)},\dots, w_{i-1}) - 0 \right) \frac{\partial}{\partial \theta}\hat{r}^T q_{j} +b_{j}
 \end{align*}
 
 $\frac{\partial}{\partial \theta}\hat{r}^T q_{j} +b_{j}$ with respect to $b_j$:
