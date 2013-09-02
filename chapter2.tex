@@ -62,7 +62,7 @@ P(w_i | w_{i-(n-1)},\dots, w_{i-1}) = \frac{count(w_{i-(n-1)},\dots,w_{i-1},w_i)
 where $|V|$ is the size of the vocabulary. While this does solve the issue of zero-frequency elements, Laplacian smoothing gives bad estimates. This is because Laplacian smoothing does not take advantage of any prior information about the word probability distribution.
 \subsubsection{Advanced Smoothing Techniques}
 \paragraph{}
- Other smoothing techniques that have been applied to n-gram models include: \emph{Good-Turing models, Katz back-off models, interpolated models}, and \emph{modified Kneser-Ney models}. Modified Kneser-Ney is generally the preferred smoothing method due to its good performance. These smoothing techniques use knowledge of rarely seen words to estimate counts of unseen words. The Good-Turing approach modifies the counts of word sequences to be more similar to word sequences seen more frequently. The Katz back-off model backs-off to lower order n-gram models for zero-frequency word sequences. Interpolated models interpolate between different order n-gram models. Modified Kneser-Ney smoothing combines back-off smoothing and model interpolation \cite{Jurafsky2009}.
+ Other smoothing techniques that have been applied to n-gram models include: \emph{Good-Turing models, Katz back-off models, interpolated models}, and \emph{modified Kneser-Ney models}. Modified Kneser-Ney is generally the preferred smoothing method as it has the best performance. These smoothing techniques use knowledge of rarely seen words to estimate counts of unseen words. The Good-Turing approach modifies the counts of word sequences to be more similar to word sequences seen more frequently. The Katz back-off model backs-off to lower order n-gram models for zero-frequency word sequences. Interpolated models interpolate between different order n-gram models. Modified Kneser-Ney smoothing combines back-off smoothing and model interpolation \cite{Jurafsky2009}.
 
 \section{Maximum Entropy  Models}
 \paragraph{}
@@ -150,9 +150,9 @@ The LBL model is formulated:
 \begin{align}
 P(w_i | w_{i-(n-1)},\dots, w_{i-1})  =& \frac{ \exp( \hat{r}^T q_{w_i} +b_{w_i}) } { \sum_j \exp( \hat{r}^T q_{w_j} +b_{w_j})} \label{eq:LBL}
 \\ 
-\hat{r} =& \sum_{j=1}^{n-1} C_j r_{w_j} \nonumber
+\hat{r} =& \sum_{k=1}^{n-1} C_k r_{w_k} \nonumber
 \end{align} 
-where $r_{w_j}$ is the vector representation for context word $w_j$ and $q_{w_i}$ is the vector representation for the target word $w_i$. $C_i$ is the matrix that corresponds to the interaction between the $i$th context word and the target word. $b_{w_i}$ is a bias term for word $w_i$. $\hat{r}$ can be thought of as a prediction vector for $w_i$. Note that there are separate representations $r_{w_j}$, and $q_{w_i}$ for context words and target words respectively, even if the actual word is the same.
+where $r_{w_k}$ is the vector representation for context word $w_k$ and $q_{w_i}$ is the vector representation for the target word $w_i$. $C_k$ is the matrix that corresponds to the interaction between the $k$th context word and the target word. $b_{w_i}$ is a bias term for word $w_i$. $\hat{r}$ can be thought of as a prediction vector for $w_i$. Note that there are separate representations $r_{w_k}$, and $q_{w_i}$ for context words and target words respectively, even if the actual word is the same.
 
 \paragraph{}
 The model is trained using stochastic gradient ascent to maximize the log-likelihood. The training is described in \cite{MnihHinton2007}.
