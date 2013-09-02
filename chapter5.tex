@@ -19,7 +19,7 @@ I have described the algorithms to build specific trees in Section \ref{sec:tree
 \paragraph{}
 When reading in trees from binary codes, it is necessary to build the tree top-down. To build the tree, I read in every code, and for each digit in the code, add in a node if necessary. If a new code has a branch that does not exist in the tree, I create it, and continue parsing the code.
 
-\subsection{Mixture of Gaussians for ADAPTIVE trees}
+\subsection{Mixture of Gaussians for ADAPTIVE Trees}
 \paragraph{}
 A \emph{Gaussian Mixture Model} (GMM) is used to cluster word representations in the ADAPTIVE and Recursive ADAPTIVE trees described in Section \ref{sec:recursiveADAPTIVETree}. To initialize the parameters for the GMM, I randomly assign the word representations into two groups, and then calculate the group means and covariances to initialize $\mu_k$ and $\sigma_k$. The mixing coefficients $\pi_k$ are initialized to the uniform distribution. Also, when calculating the Gaussian, I find it much faster to use diagonalized covariance matrices. While this does lose some representational power of the covariance matrices, I find the speedup to be worth it. I run each GMM until convergence, or for 10 epochs, whichever is less. If any of the parameters become ill-defined, I back off to the previous epoch's values. 
 

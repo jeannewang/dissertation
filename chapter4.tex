@@ -34,7 +34,7 @@ where $\theta$ is shorthand for all of the parameters of the model ($Q,R,B$, and
 \paragraph{}
 In Equation \ref{eq:likelihoodDecisions}, the product over $j$ corresponds to the product of all binary decision probabilities along the path in the tree to word $w_i$. Each binary decision is made at a node $j$. Additionally, note the use of the simplifying assumption that binary decision predictions are independent of each other in Equation \ref{eq:likelihoodDecisions}.
 \paragraph{}
-Given that we are maximizing the likelihood, we would like to choose parameters, such that $\hat{\theta} = \argmax_\theta J(\theta;w_1,\dots, w_m)$. The set of parameters $\hat{\theta}$ is known as the \emph{maximum likelihood estimator} of $\theta$ \cite{Elkan2013}.  In our actual usage of the objective function we will modify it slightly. We can take the negative natural logarithm of the objective function to get the \emph{negative log likelihood}. For mathematical and computational convenience, we will be minimizing the negative log likelihood which is equivalent to maximizing the likelihood, since logarithm is a strictly monotonically increasing function \cite{Elkan2013}. We minimize the negative log likelihood such that  $\hat{\theta} = \argmin_\theta -\ln(J(\theta;w_1,\dots, w_m))$.
+Given that we are maximizing the likelihood, we would like to choose parameters, such that $\hat{\theta} = \argmax_\theta J(\theta;w_1,\dots, w_m)$. The set of parameters $\hat{\theta}$ is known as the \emph{maximum likelihood estimator} of $\theta$ \cite{Elkan2013}.  In our actual usage of the objective function we will modify it slightly. We can take the negative natural logarithm of the objective function to get the \emph{negative log-likelihood}. For mathematical and computational convenience, we will be minimizing the negative log-likelihood which is equivalent to maximizing the likelihood, since logarithm is a strictly monotonically increasing function \cite{Elkan2013}. We minimize the negative log-likelihood such that  $\hat{\theta}~=~\argmin_\theta -\ln(J(\theta;w_1,\dots, w_m))$.
 From Equations \ref{eq:likelihood} and \ref{eq:likelihoodDecisions}, it follows that:
 \begin{align}
 &-\ln(J(\theta;w_1,\dots, w_m)) = \sum_{i=1}^{m} -\ln(P(w_i | w_{i-(n-1)},\dots, w_{i-1}))
@@ -65,30 +65,31 @@ In Figure \ref{fig:btree}, the four word probabilities $(\frac{1}{3},\frac{1}{3}
 
 \begin{figure}
 \Tree [.$dp=1$ [.$dp=\frac{2}{3}$ [.{$dp=\frac{1}{2}$} {$wp = \frac{1}{3}$} ]  [.{$dp=\frac{1}{2}$} {$wp = \frac{1}{3}$} ]] [.$dp=\frac{1}{3}$ [.{$dp=\frac{1}{4}$} {$wp = \frac{1}{12}$} ] [.{$dp=\frac{3}{4}$} {$wp = \frac{1}{4}$} ] ]  ]
-\caption{Binary decision probabilities in a tree. dp is a decision probability and wp is a word probability.}
+\caption{Binary decision probabilities in a tree. Each $dp$ is a decision probability and Each $wp$ is a word probability.}
 \label{fig:btree}
 \end{figure}
 
 \subsubsection{Regularization}
 \paragraph{}
-Standard maximum likelihood estimation solutions tend to overfit. This over fitting comes from the fact that parameter values are unbounded, so in the limit, the parameter values may go to infinity when maximizing the overall objective function. To stop parameters from going to infinity, \emph{regularization} is added. Regularization simply adds a penalty to large parameter values. Many types of penalties exist, but I will be using the squared $L_2$ norm ($||x||^2_2$) as a penalizer. The maximum likelihood estimator then becomes:
+Standard maximum likelihood estimation solutions tend to overfit. This overfitting comes from the fact that parameter values are unbounded, so in the limit, the parameter values may go to infinity when maximizing the overall objective function. To stop parameters from going to infinity, \emph{regularization} is added. Regularization simply adds a penalty to large parameter values. Many types of penalties exist, but I will be using the squared $L_2$ norm ($||x||^2_2$) as a penalizer. The maximum likelihood estimator then becomes:
 \begin{align}
 &\hat{\theta} = \argmin_\theta -\ln(J(\theta;w_1,\dots, w_m)) +  \mu ||\theta||^2_2
 \\
 & ||\theta||^2_2 = \sum_{j=1}^d \theta_j^2 \nonumber
 \end{align}
-Where $\mu$ is the regularization parameter that controls the tradeoff between maximizing J and minimizing the parameter values and $d$ is the length of the parameter vector $\theta_j$ \cite{Elkan2013}. Note that with regularization, our estimate is a \emph{maximum a posteriori} estimation using a Gaussian prior with mean 0 and variance $\sqrt{\frac{1}{2\mu}}$.
+where $\mu$ is the regularization parameter that controls the tradeoff between maximizing J and minimizing the parameter values and $d$ is the length of the parameter vector $\theta_j$ \cite{Elkan2013}. Note that with regularization, our estimate is a \emph{maximum a posteriori} estimation using a Gaussian prior with mean 0 and variance $\sqrt{\frac{1}{2\mu}}$.
 
 \subsubsection{Similarity to Logistic Regression}
 \paragraph{}
 The HLBL model is actually similar to \emph{logistic regression}. We can think of HLBL as logistic regression with knowledge of context words. 
 The standard logistic regression model looks like:
 \begin{align}
-P(y =1 | x; \alpha, \beta) = \sigma \left( \sum_{j=1}^d \beta_j x_j + \alpha \right)
+P(y =1 | x; \alpha, \beta) = \sigma \left( \sum_{j=1}^k \beta_j x_j + \alpha \right)
 \end{align}
+where $k$ is the dimensionality of an example $x_j$.
 If we reformulate the logistic regression model to look like the HLBL:
 \begin{align}
-P( b_j(w_j) = 1 | w_i; b_j, q_j) = \sigma \left( \sum_{j=1}^d q_j w_j + b_j \right)
+P( d_j(w_j) = 1 | w_j; b_j, q_j) = \sigma \left( \sum_{j=1}^k q_j w_j + b_j \right)
 \end{align}
 We can then compare it against the HLBL model:
 \begin{align}
@@ -97,7 +98,7 @@ P(d_j(w_i) = 1 | q_j, w_{i-(n-1)},\dots, w_{i-1}) =  \sigma( (\sum_i C_i r_{w_i}
 We see that most of the two models are the same, the main difference being the addition of the $C_i$ matrices.  The $C_i$ matrices hold parameters that deal with the interactions between context words and nodes in the tree. The $q_j$ term also plays a different role. In the logistic regression model, $q_j$ is a weight for word $w_j$, whereas in the HLBL model, $q_j$ is a vector representation for a node in the tree. Still, the models are similar and we can think of HLBL as logistic regression for nodes in the tree, weighted by context prediction vectors.
 
 
-\subsection{Model training}
+\subsection{Model Training}
 \paragraph{}
 To train the HLBL model, we need a way to minimize the parameters $\theta$. One way to minimize the parameters is through an iterative scheme that moves closer to the (local) minimum on each step called gradient descent. The HLBL objective function is smooth and so is easily differentiable. However, it is not convex so it may have more than one minimum. 
 \subsubsection{Gradient Descent}
@@ -169,7 +170,7 @@ where diag$(x)$ is the diagonal matrix of $x$.
 \paragraph{}
 In this dissertation, I will be training my models using adaptive stochastic gradient descent with mini-batches.
 
-\subsection{Model testing}
+\subsection{Model Testing}
 \paragraph{}
 As described in Section \ref{sec:perplexity}, I will be comparing my models using their test perplexity.
 \subsubsection{Perplexity}
@@ -190,7 +191,7 @@ We can fill in the equation for perplexity given by Equation \ref{eq:perplexity}
 where $K$ is the number of testing examples. 
 
 
-\section{Tree creation} \label{sec:treeCreation}
+\section{Tree Creation} \label{sec:treeCreation}
 \paragraph{}
 The binary tree used in the HLBL model can make a significant difference to the model performance and speed. In this dissertation, I explore three different types of trees.
 \subsection{Huffman Trees}
@@ -289,11 +290,11 @@ merge two clusters $c_a$ and $c_b$ such that Quality(C) is maximized
 
 \subsubsection{Creation Complexity}
 \paragraph{}
-Calculation of the original Brown Clusters takes $O(|V|^5)$ calculations and Brown-Liang clusters requires $O(|V| m^2+n|)$ calculations where $m$ is the number of initial clusters and $n$ is the corpus length.  
+Calculation of the original Brown Clusters takes $O(|V|^5)$ calculations and Brown-Liang clusters requires $O(|V| m^2+n|)$ calculations where $m$ is the number of initial clusters and $n$ is the size of the training data.  
 
 \subsection{Recursive ADAPTIVE Trees} \label{sec:recursiveADAPTIVETree}
 \paragraph{}
-Another tree introduced in \cite{MnihHinton2009} is the ADAPTIVE tree. The ADAPTIVE tree is also mentioned in Section \ref{sec:HLBL}. The ADAPTIVE tree is created top-down by clustering on learned prediction vectors. The clustering method is a mixture of two Gaussians. The clusters are created with respect to the most responsible Gaussian, which generally creates a non-balanced tree. The mixture of two Gaussians is applied recursively until a full tree is formed. The real power behind this method comes from clustering on learned prediction vectors which are better than the unigram or co-occurance statistics that inform Huffman and Brown cluster trees. The ADAPTIVE tree creates decision nodes that separate dissimilar prediction vectors, and cluster together similar prediction vectors. 
+Another tree introduced in \cite{MnihHinton2009} is the ADAPTIVE tree. The ADAPTIVE tree is also mentioned in Section \ref{sec:HLBL}. The ADAPTIVE tree is created top-down by clustering on learned prediction vectors. The clustering method is a \emph{mixture of two Gaussians}. The clusters are created with respect to the most responsible Gaussian, which generally creates a non-balanced tree. The mixture of two Gaussians is applied recursively until a full tree is formed. The real power behind this method comes from clustering on learned prediction vectors which are better than the unigram or co-occurence statistics that inform Huffman and Brown cluster trees. The ADAPTIVE tree creates decision nodes that separate dissimilar prediction vectors, and cluster together similar prediction vectors. 
 
 \paragraph{}
 Mnih and Hinton use learned prediction vectors from the HLBL model with a random tree. I~think starting off with a better tree such as a Huffman tree or a Brown Cluster tree for the initial HLBL model can improve the ADAPTIVE tree performance. Additionally, I think recursively training the ADAPTIVE tree, on the results from the HLBL model with an ADAPTIVE tree could be fruitful. This would result in the Recursive ADAPTIVE tree which actually has two levels of recursion. This first level of recursion comes from running the ADAPTIVE algorithm multiple times. The second level of recursion comes from running the mixture of Gaussians multiple times within the ADAPTIVE algorithm.  On the first level of recursion, by recursively adapting the tree, the tree can better capture the learned word representations, which results in better learned word representations. 
@@ -344,9 +345,9 @@ GaussianMixtureModel:
  \KwData{ set of word vectors R}
  \KwResult{ responsibilities $\gamma$}
 Initialize means $\mu_k$, covariances $\sigma_k$ and mixing coefficients $\pi_k$
-\\Evaluate the initial log likelihood
+\\Evaluate the initial log-likelihood
 \\
-\While{parameters have not converged and log likelihood has not converged}{
+\While{parameters have not converged and log-likelihood has not converged}{
 	E step:
 	\\ $\gamma(z_{nk}) = \frac{ \pi_k \mathcal{N}(R_n|\mu_k,\sigma_k) }{\sum_{j=1}^K \pi_j \mathcal{N}( R_n| \mu_j, \sigma_j) }$
 	\\ M step:
@@ -354,7 +355,7 @@ Initialize means $\mu_k$, covariances $\sigma_k$ and mixing coefficients $\pi_k$
 	\\ $ \mu_k^{new} = \frac{1}{N_k} \sum_{n=1}^N \gamma(z_{nk}) R_n$
 	\\ $\sigma_k^{new} = \frac{1}{N_k}\sum_{n=1}^N \gamma(z_{nk}) (R_n - \mu_k^{new}) (R_n - \mu_k^{new})^T $
 	\\ $ \pi_k^{new} = \frac{N_k}{N}$
-	\\ Evaluate the log likelihood:
+	\\ Evaluate the log-likelihood:
 	\\ $\ln( Pr(R|\mu,\sigma,\pi)) = \sum_{n=1}^N \ln \left( \sum_{k=1}^K \pi_k \mathcal{N}(R_n| \mu_k, \sigma_k) \right)$
 }
 \Return $\gamma$

@@ -7,7 +7,7 @@ I have conducted experiments to show the performance and speed of the HLBL model
 
 \subsection{Dataset}
 \paragraph{}
-For most of my experiments, I use the Penn Treebank dataset. Specifically, I use the Wall Street Journal (WSJ) sections 2-21 for my training set and section 22 for my testing set. There are 950,028 training tokens and 40,117 testing tokens. The training set has been pre-processed to replace any word that occurs less than 6 times with "\_UNK\_". This reduces the vocabulary to 10,531 words. The testing set has also been preprocessed to replace any word not seen in the training set with "\_UNK\_".
+For most of my experiments, I use the Penn Treebank dataset. Specifically, I use the Wall Street Journal (WSJ) sections 2-21 for my training set and section 22 for my testing set. There are 950,028 training tokens and 40,117 testing tokens. The training set has been preprocessed to replace any word that occurs less than 6 times with "\_UNK\_". This reduces the vocabulary to 10,531 words. The testing set has also been preprocessed to replace any word not seen in the training set with "\_UNK\_".
 
 %WSJ sections 2-21, with words that occur only once preprocessed out, as a training set. This set has a vocabulary size of 23768. 
 
@@ -23,7 +23,7 @@ In this section I will briefly describe the experiments and their aims, then dis
 The creation of the trees used in the HLBL model can be done separately from the model. We can look at the trees themselves and see if any of their traits contribute to their performance within the HLBL model.  In Table \ref{tab:trees}, we can see the tree creation statistics. I will not describe tree $T_6$ in this section, as the tree is described in Section \ref{sec:ADAPTIVEQ}.
  
 \paragraph{}
-The mean code length gives us the average number of decisions that must be made per word. The training time is linear in the mean code length. We would expect the Huffman tree to have the shortest mean length, but the ADAPTIVE(word2vec) tree is actually shorter. This is because the Huffman tree is guaranteed to have the shortest average mean length on the training data unigram frequencies, but the ADAPTIVE(word2vec) tree is created using frequencies learned from the testing data. The Huffman tree has the shortest mean length when the word frequencies agree with those used to create the tree. Given that the Huffman tree has the shortest mean length for the training set data, it is interesting that the Recursive~ADAPTIVE(2,Huffman) tree has a much larger mean length. Hopefully this implies that the Recursive~ADAPTIVE(2,Huffman) tree is giving up short codes for the addition of more useful decision nodes. If we delve further into the code length, we can see how code length affects the test word perplexities. In Table \ref{tab:perplexityCodeLength}, we can see the breakdown of average word perplexities per code length for each tree. The breakdown follows the intuition that longer codes will have worse perplexities. This is due to the increased number of decisions that must be made correctly as the code gets longer. The random tree does not stay true to this intuition, though this is perhaps because of the random tree's tendency to have subtrees that look left-deep or right-deep , whereas the other trees tend to be bushy. Figure \ref{fig:deepvsbushytrees} gives an example of left-deep, bushy, and right-deep trees. The left-deep and right-deep trees have much higher probabilities of going one direction than the other, so long codes may still have high probabilities. The left-deep and right-deep tendencies of the random tree is an artifact of my implementation. In general, random trees should be fairly balanced.
+The mean code length gives us the average number of decisions that must be made per word. The training time is linear in the mean code length. We would expect the Huffman tree to have the shortest mean length, but the ADAPTIVE(word2vec) tree is actually shorter. This is because the Huffman tree is guaranteed to have the shortest average mean length on the training data unigram frequencies, but the ADAPTIVE(word2vec) tree is created using frequencies learned from the testing data. The Huffman tree has the shortest mean length when the word frequencies agree with those used to create the tree. Given that the Huffman tree has the shortest mean length for the training set data, it is interesting that the Recursive~ADAPTIVE(2,Huffman) tree has a much larger mean length. Hopefully this implies that the Recursive~ADAPTIVE(2,Huffman) tree is giving up short codes for the addition of more useful decision nodes. If we delve further into the code length, we can see how code length affects the test word perplexities. In Table \ref{tab:perplexityCodeLength}, we can see the breakdown of average word perplexities per code length for each tree. The breakdown follows the intuition that longer codes will have worse perplexities. This is due to the increased number of decisions that must be made correctly as the code gets longer. The random tree does not stay true to this intuition, though this is perhaps because of the random tree's tendency to have subtrees that look left-deep or right-deep , whereas the other trees tend to be bushy. Figure \ref{fig:deepvsbushytrees} gives an example of left-deep, bushy, and right-deep trees. The left-deep and right-deep trees have much higher probabilities of going one direction than the other, so long codes may still have high probabilities. The left-deep and right-deep tendencies of the random tree are artifacts of my implementation. In general, random trees should be fairly balanced.
 
 \begin{figure}\centering
 \begin{tabular}{ccc}
@@ -31,7 +31,7 @@ The mean code length gives us the average number of decisions that must be made 
 \Tree [.x   [.x [.x {x} {x} ] [.x {x} {x} ]  ]    [.x [.x {x} {x} ]  [.x {x} {x} ] ] ] &
 \Tree [.x    {\dots}  [.x    {\dots}  [.x    {\dots} {x} ]  ]  ] 
 \end{tabular} 
-\caption{Left-deep, Bushy, and Right-deep trees}
+\caption{Left-deep, bushy, and right-deep trees}
 \label{fig:deepvsbushytrees}
 \end{figure}
 
@@ -120,7 +120,7 @@ $5$ & 109.577 & 25.39\\
 
 \subsection{Varying Representation Dimensionality}
 \paragraph{}
-The expressivity of the model directly depends on the representation dimensionality. As the size of the vocabulary and training set grows, the expressivity of the model should also grow in order to capture the additional information given by new word combinations and patterns. Mnih and Hinton in \cite{MnihHinton2009} explore varying representation dimensionalities under 100 dimensions. They find that larger dimensions afford better model performance. Mnih and Hinton conclude that 100 dimensions is enough to capture the complexities of the APNews dataset's 17964K vocabulary. I looked at representation dimensionalities larger than 100, and found the HLBL model trained on the WSJ dataset benefits from larger word representations. The results can be found in Table \ref{tab:wordRepSize}. Simply by increasing the representation size, even with a random tree, we can see an increase in performance. The increases seem to tail off around 300 dimensions.  The HLBL model may need larger representation sizes than the standard LBL model, as the node representations may need to be larger to capture the complexities of the decision tree.
+The expressivity of the model directly depends on the representation dimensionality. As the size of the vocabulary and training set grows, the expressivity of the model should also grow in order to capture the additional information given by new word combinations and patterns. Mnih and Hinton in \cite{MnihHinton2009} explore varying representation dimensionalities under 100 dimensions. They find that larger dimensions afford better model performance. Mnih and Hinton conclude that 100 dimensions is enough to capture the complexities of the APNews dataset's 17,964 word vocabulary. I looked at representation dimensionalities larger than 100, and found the HLBL model trained on the WSJ dataset benefits from larger word representations. The results can be found in Table \ref{tab:wordRepSize}. Simply by increasing the representation size, even with a random tree, we can see an increase in performance. The increases seem to tail off around 300 dimensions.  The HLBL model may need larger representation sizes than the standard LBL model, as the node representations may need to be larger to capture the complexities of the decision tree.
 
 
 \begin{table*} \centering
@@ -139,20 +139,20 @@ $300$ & 111.102 \\
 \label{tab:wordRepSize}
 \end{table*}
 
-\subsection{Comparison Against Other Models}
+\subsection{Comparison against Other Models}
 \paragraph{}
-I also compared the HLBL model with the various trees from Table \ref{tab:trees} to other language models. All of the HLBL models have the same parameters as described in Section \ref{sec:experiments}. The LBL and Factored LBL models are implemented by Phil Blunsom. The Factored LBL model is the frequency binned model described in Section \ref{sec:frequencybinning}. The model uses 100 frequency classes. The 5-gram with modified Kneser-Ney smoothing is run using the SRILM implementation \cite{Alumae2010}.
+I also compared the HLBL model with the various trees from Table \ref{tab:trees} to other language models. All of the HLBL models have the same parameters as described in Section \ref{sec:experiments}. The LBL and Factored LBL models are implemented by Phil Blunsom. The Factored LBL model is the frequency-binned model described in Section \ref{sec:frequencybinning} applied to the LBL model. The model uses 100 frequency classes. The 5-gram with modified Kneser-Ney smoothing is run using the SRILM implementation \cite{Alumae2010}.
 The models are allowed to run until their test perplexities stop decreasing. The results are given in Table \ref{tab:languageModelComparison}. The reduction in perplexities and entropy is given in Table \ref{tab:reductionPerplexity}. 
 
 \paragraph{}
-The Factored LBL model is the best speed-up technique to compare the HLBL model to, as both techniques try to limit the effective vocabulary and also speed up both the training and testing components.
+The Factored LBL model is the best speedup technique to compare the HLBL model to, as both techniques try to limit the effective vocabulary and also speed up both the training and testing components. The Factored LBL has very good performance and is comparable to the LBL.
 
 \paragraph{}
-All of the HLBL models, including using a random tree, perform better than the 5-gram Kneser-Ney model,  therefore even simple neural models are more expressive than co-occurence statistics. We can see the performance of all the models compared to the 5-gram model in table \ref{tab:reductionPerplexity}. The best proposed HLBL model in terms of performance uses a Brown Cluster tree ($T_3$) and the best HLBL model considering both time and performance uses the Huffman tree ($T_2$). In Table \ref{tab:perplexityAndSpeedup}, we can see the performance of the Brown Cluster tree and Huffman tree against the LBL and Factored LBL. The Brown Cluster tree HLBL model is pretty good in terms of performance compared to the LBL and Factored LBL models. However, creating the Brown Cluster tree is incredibly slow, and the total time for the HLBL model with a Brown Cluster tree is over an order of magnitude greater than the time for the LBL and Factored LBL models. While the Brown Cluster tree performs as well as any other tree in terms of training time per epoch and testing time, the tree creation time is extremely high. As the overall purpose of this project is to find a tree that is both fast and performs reasonably, the Brown Cluster tree, sadly, does not cut it. Probably the best tree given these criteria, is the Huffman tree. The HLBL model with the Huffman tree is about twice as fast as both the LBL and Factored LBL model, but is also about 15\% worse in terms of perplexity compared to both the LBL and Factored LBL. Still, this can be a small price to pay when it comes to large corpora with hundreds of thousands of words in their vocabulary for a $O(\frac{|V|}{\log|V|})$ speed-up versus a $O(\sqrt{|V|})$ speed-up. The last two HLBL models use the Recursive ADAPTIVE algorithm ($T_4$ and $T_5$). The Recursive ADAPTIVE algorithm essentially creates Brown Cluster-like trees given existing representations. The resultant trees have semantically/syntactically similar words close together in the tree. At least on a vocabulary of 10K, the Recursive ADAPTIVE algorithm is faster than the Brown Clustering algorithm at creating trees. The Recursive ADAPTIVE tree HLBL models' performances fall between the Brown Cluster and Huffman tree HLBL performances. The Recursive ADAPTIVE algorithm is not fast enough however to be worth using over the simple Huffman tree. 
+All of the HLBL models, including using a random tree, perform better than the 5-gram modified Kneser-Ney model,  therefore even simple neural models are more expressive than co-occurence statistics. We can see the performance of all the models compared to the 5-gram model in table \ref{tab:reductionPerplexity}. The best proposed HLBL model in terms of performance uses a Brown Cluster tree ($T_3$) and the best HLBL model considering both time and performance uses the Huffman tree ($T_2$). In Table \ref{tab:perplexityAndSpeedup}, we can see the performance of the Brown Cluster tree and Huffman tree against the LBL and Factored LBL. The Brown Cluster tree HLBL model is pretty good in terms of performance compared to the LBL and Factored LBL models. However, creating the Brown Cluster tree is incredibly slow, and the total time for the HLBL model with a Brown Cluster tree is over an order of magnitude greater than the time for the LBL and Factored LBL models. While the Brown Cluster tree performs as well as any other tree in terms of training time per epoch and testing time, the tree creation time is extremely high. As the overall purpose of this project is to find a tree that is both fast and performs reasonably, the Brown Cluster tree, sadly, does not cut it. Probably the best tree given these criteria, is the Huffman tree. The HLBL model with the Huffman tree is about twice as fast as both the LBL and Factored LBL model, but is also about 15\% worse in terms of perplexity compared to both the LBL and Factored LBL. Still, this can be a price worth paying when it comes to large corpora with hundreds of thousands of words in their vocabulary for a $O(\frac{|V|}{\log|V|})$ speedup versus a $O(\sqrt{|V|})$ speedup. The last two HLBL models use the Recursive ADAPTIVE algorithm ($T_4$ and $T_5$). The Recursive ADAPTIVE algorithm essentially creates Brown Cluster-like trees given existing representations. The resultant trees have semantically/syntactically similar words close together in the tree. At least on a vocabulary of 10K, the Recursive ADAPTIVE algorithm is faster than the Brown Clustering algorithm at creating trees. The Recursive ADAPTIVE tree HLBL models' performances fall between the Brown Cluster and Huffman tree HLBL performances. The Recursive ADAPTIVE algorithm is not fast enough however to be worth using over the simple Huffman tree. 
 
 \begin{table*} \centering
 \ra{1.3}
-\begin{tabular}{@{}cccC{2cm}C{2cm}cc@{}}\toprule
+\begin{tabular}{@{}C{3cm}ccC{2cm}C{2cm}cc@{}}\toprule
 Model & Tree & Perplexity & Epochs Till Convergence & Training Time Per Epoch & Testing Time & Total Time\\ 
 \midrule
  HLBL & $T_1$ &119.339 & 71& 40.19s & 0.57s& 2855.26s\\
@@ -162,7 +162,7 @@ Model & Tree & Perplexity & Epochs Till Convergence & Training Time Per Epoch & 
  HLBL & $T_5$ &106.992 & 114& 37.08s & 0.58s& 14742.52\\
  LBL& - &97.21 &62 &106.98s & 21.47s& 6654.23s\\
  Factored LBL & - &98.42&101 & 47.19s & 0.56s & 4766.75s \\
- 5-gram KN & - &122.752& 1 & 5.51s & 0.348s & 5.51s\\
+ 5-gram modified KN & - &122.752& 1 & 5.51s & 0.348s & 5.51s\\
 \bottomrule
 \end{tabular}
 \caption{Comparison of HLBL model with various trees and other language models on WSJ dataset}
@@ -183,7 +183,7 @@ Model & Tree & Reduction in Perplexity & Reduction in Entropy \\
  Factored LBL & - &19.82\%&4.59\% \\
 \bottomrule
 \end{tabular}
-\caption{Reduction in perplexity and entropy compared to the 5-gram Kneser-Ney smoothed model on WSJ dataset}
+\caption{Reduction in perplexity and entropy compared to the 5-gram modified Kneser-Ney smoothed model on WSJ dataset.}
 \label{tab:reductionPerplexity}
 \end{table*}
 
@@ -200,7 +200,7 @@ Model & Tree
  HLBL & $T_3$ & 4.28\% & 0.95\% & 3.09\% & 0.68\% &$41\times$ slower & $57\times$ slower\\
 \bottomrule
 \end{tabular}
-\caption{HLBL models compared against the LBL and Factored LBL models on the WSJ dataset}
+\caption{HLBL models compared against the LBL and Factored LBL models on the WSJ dataset.}
 \label{tab:perplexityAndSpeedup}
 \end{table*}
 
@@ -318,7 +318,7 @@ $T_6$& 104.477 & 83& 35.46s & 0.56s& 5013.57s\\
 \label{tab:brownWord2vec}
 \end{table*}
 
-\subsection{Visualization of HLBL models with word2vec $Q$ Initialization}
+\subsection{Visualization of HLBL Models with word2vec $Q$ Initialization}
 \paragraph{}
 I ran the t-SNE visualizations described in Section \ref{sec:tsne} over the HLBL models with $Q$ initialized to the word2vec representations. Note that I did not include the Huffman tree with word2vec $Q$ initialization since the model does not seem to be better than its non-word2vec initialized counterpart. The results can be seen in Figures \ref{fig:QcloudWord2Vec} and \ref{fig:RcloudWord2Vec}. We see that the $Q$ word-clouds make more semantically and syntactically similar clusters unlike the models without the word2vec $Q$ initialization. This is exactly the result we were looking for. The $R$ word-clouds remain largely unchanged. 
 
