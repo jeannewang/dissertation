@@ -1,12 +1,10 @@
 
 \chapter{Engineering Details}
 \paragraph{}
-In this chapter I will describe engineering tasks undertaken in the course of the project. These include model initialization, tree creation, gradient checking, and variable caching.
+In this chapter, I will describe in more detail important engineering tasks necessary to build the HLBL model, described in Section \ref{sec:proposedModel}. These tasks include initializing the model, building binary trees, checking the finite gradient and also caching key parameters.
 
 \paragraph{}
 My implementation of the HLBL model is an extension of the C++ LBL implementation by Phil Blunsom. Additionally, I use tree.hh: an STL-like C++ tree library written by Kasper Peeters, and the Boost \cite{BoostSite} and Eigen \cite{eigenweb} libraries. The full implementation can be found online at \url{https://github.com/jeannewang/oxlm}. Much of the code can be found in Appendix C.
-\paragraph{}
-In this section, I will describe in more detail important engineering tasks necessary to build the HLBL model, described in Section \ref{sec:proposedModel}. These tasks include initializing the model, building binary trees, checking the finite gradient and also caching key parameters.
 
 \section{Model Initialization}
 \paragraph{}
@@ -17,13 +15,13 @@ Intelligent initialization of the bias matrix can improve perplexity measures. T
 
 \section{Building Trees}
 \paragraph{}
-I have described the algorithms to build specific trees in Section \ref{sec:treeCreation}, but I will describe here some additional tips for building trees. I use simple integer trees for my binary trees. My trees contain indices into the $Q$ matrix for the internal node values, and indices into the $R$ matrix for the leaf values. The indices into the $R$ matrix are also the word indices. To tell if I am looking at a word, or a node, I simply check if the node is a leaf node or not.  I found building binary trees for vocabularies to be easier going bottom-up than top-down. This is because one can group together "similar" words more easily by going from the words to the nodes, than the other way around. I also found that the easiest way to keep track of indices to the $Q$ matrix is by storing the indices in the tree. It makes no difference which $Q$ node is assigned to which $Q$ index so long as it is consistent. I just assign $Q$ indices sequentially breadth-first though the tree. 
+I have described the algorithms to build specific trees in Section \ref{sec:treeCreation}, but I will describe here some additional tips for building trees. I use simple integer trees for my binary trees. My trees contain indices into the $Q$ matrix for the internal node values, and indices into the $R$ matrix for the leaf values. The indices into the $R$ matrix are also the word indices. To tell if I am looking at a word, or a node, I check if the node is a leaf node or not.  I found building binary trees for vocabularies to be easier going bottom-up than top-down. This is because one can group together "similar" words more easily by going from the words to the nodes, than the other way around. I also found that the easiest way to keep track of indices to the $Q$ matrix is by storing the indices in the tree. It makes no difference which $Q$ node is assigned to which $Q$ index so long as it is consistent. I assign $Q$ indices sequentially breadth-first though the tree. 
 \paragraph{}
-When reading in trees from binary codes, it is necessary to build the tree top-down. To build the tree, I read in every code, and for each digit in the code, add in a node if necessary. If a new code has a branch that does not exist in the tree, I simply create it, and continue parsing the code.
+When reading in trees from binary codes, it is necessary to build the tree top-down. To build the tree, I read in every code, and for each digit in the code, add in a node if necessary. If a new code has a branch that does not exist in the tree, I create it, and continue parsing the code.
 
 \subsection{Mixture of Gaussians for ADAPTIVE trees}
 \paragraph{}
-A \emph{Gaussian Mixture Model} (GMM) is used to cluster word representations in the ADAPTIVE and Recursive ADAPTIVE trees described in Section \ref{sec:recursiveADAPTIVETree}. To initialize the parameters for the GMM, I randomly assign the word representations into two groups, and from there calculate the group means and covariances to initialize $\mu_k$ and $\sigma_k$. The mixing coefficients $\pi_k$ are initialized to the uniform distribution. Also, when calculating the Gaussian, I find it much faster to use diagonalized covariance matrices. While this does lose some representational power of the covariance matrices, I find the speedup to be worth it. I run each GMM until convergence, or for 10 epochs, whichever is less. If any of the parameters become ill-defined, I simply back off to the previous epoch's values. 
+A \emph{Gaussian Mixture Model} (GMM) is used to cluster word representations in the ADAPTIVE and Recursive ADAPTIVE trees described in Section \ref{sec:recursiveADAPTIVETree}. To initialize the parameters for the GMM, I randomly assign the word representations into two groups, and then calculate the group means and covariances to initialize $\mu_k$ and $\sigma_k$. The mixing coefficients $\pi_k$ are initialized to the uniform distribution. Also, when calculating the Gaussian, I find it much faster to use diagonalized covariance matrices. While this does lose some representational power of the covariance matrices, I find the speedup to be worth it. I run each GMM until convergence, or for 10 epochs, whichever is less. If any of the parameters become ill-defined, I back off to the previous epoch's values. 
 
 \section{Finite Gradient Check}
 \paragraph{}

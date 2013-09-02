@@ -1,9 +1,9 @@
 \chapter{Proposed Model and Trees}
-In this chapter I will cover the details of the hierarchical log-bilinear model including the model definition, the method of training and also the method of testing. I will also cover the creation methods of the three novel trees I am exploring: the Huffman tree, the Brown Cluster tree and also the Recursive ADAPTIVE tree.
+In this chapter, I will cover the details of the hierarchical log-bilinear model including the model definition, the method of training and also the method of testing. I will also cover the creation methods of the three novel trees I am exploring: the Huffman tree, the Brown Cluster tree and also the Recursive ADAPTIVE tree.
 
 \section{Proposed Model} \label{sec:proposedModel}
 \paragraph{}
-The hierarchical log-bilinear model proposed by Andriy Mnih and Geoffrey Hinton in \cite{MnihHinton2009} is the starting point for my project. Mnih and Hinton make it clear that varying the binary trees used for the hierarchical representation of the vocabulary can make a significant difference in the performance and speed of the model. To be specific, "trees
+The hierarchical log-bilinear model (HLBL) proposed by Andriy Mnih and Geoffrey Hinton in \cite{MnihHinton2009} is the starting point for my project. Mnih and Hinton make it clear that varying the binary trees used for the hierarchical representation of the vocabulary can make a significant difference in the performance and speed of the model. To be specific, "trees
 that are well-supported by the data and are reasonably well-balanced so that the resulting models
 generalize well and are fast to train and test" should be used \cite[pg. 5]{MnihHinton2009}. While Mnih and Hinton propose  effective trees to use in the HLBL model, I will explore the effects of three new binary trees. I intend to test out Huffman encoding trees, Brown Clustering trees, and Recursive ADAPTIVE trees.
 \subsection{Motivation}
@@ -32,10 +32,10 @@ We would like to find a model that is good at predicting words given a context; 
 \end{align}
 where $\theta$ is shorthand for all of the parameters of the model ($Q,R,B$, and $C_i$ for all context positions), $m$ is the size of the training set, $d_j(w_i)$ is the binary decision for word $w_i$ at node~$j$,  $q_j$ is the vector representation for node~$j$ stored in a row of $Q$, $b_{j}$ is a scalar bias term for node $j$ stored in $B$, $r_{w_i}$ is the vector representation for context word $w_i$ stored in a row of $R$, and $C_i$ is the matrix that corresponds to the interaction between the $i$th context word and the target node.  The $\hat{r}$ term can be thought of as a prediction vector for $w_i$. Also $\sigma(x)$ is the sigmoid function. 
 \paragraph{}
-In Equation \ref{eq:likelihoodDecisions}, we see a product over $j$. This corresponds to the product of all binary decision probabilities along the path in the tree to word $w_i$. Each binary decision is made at a node $j$. Additionally, note the use of the simplifying assumption that binary decision predictions are independent of each other in Equation \ref{eq:likelihoodDecisions}.
+In Equation \ref{eq:likelihoodDecisions}, the product over $j$ corresponds to the product of all binary decision probabilities along the path in the tree to word $w_i$. Each binary decision is made at a node $j$. Additionally, note the use of the simplifying assumption that binary decision predictions are independent of each other in Equation \ref{eq:likelihoodDecisions}.
 \paragraph{}
-Given that we are maximizing the likelihood, we would like to choose parameters, such that $\hat{\theta} = \argmax_\theta J(\theta;w_1,\dots, w_m)$. $\hat{\theta}$ is known as the \emph{maximum likelihood estimator} of $\theta$ \cite{Elkan2013}.  In our actual usage of the objective function we will modify it slightly. We can take the negative natural logarithm of the objective function to get the \emph{negative log likelihood}. For mathematical and computational convenience, we will be minimizing the negative log likelihood which is equivalent to maximizing the likelihood, since logarithm is a strictly monotonically increasing function\cite{Elkan2013}. We minimize the negative log likelihood such that  $\hat{\theta} = \argmin_\theta -\ln(J(\theta;w_1,\dots, w_m))$.
-From Equations \ref{eq:likelihood}, it follows that:
+Given that we are maximizing the likelihood, we would like to choose parameters, such that $\hat{\theta} = \argmax_\theta J(\theta;w_1,\dots, w_m)$. The set of parameters $\hat{\theta}$ is known as the \emph{maximum likelihood estimator} of $\theta$ \cite{Elkan2013}.  In our actual usage of the objective function we will modify it slightly. We can take the negative natural logarithm of the objective function to get the \emph{negative log likelihood}. For mathematical and computational convenience, we will be minimizing the negative log likelihood which is equivalent to maximizing the likelihood, since logarithm is a strictly monotonically increasing function \cite{Elkan2013}. We minimize the negative log likelihood such that  $\hat{\theta} = \argmin_\theta -\ln(J(\theta;w_1,\dots, w_m))$.
+From Equations \ref{eq:likelihood} and \ref{eq:likelihoodDecisions}, it follows that:
 \begin{align}
 &-\ln(J(\theta;w_1,\dots, w_m)) = \sum_{i=1}^{m} -\ln(P(w_i | w_{i-(n-1)},\dots, w_{i-1}))
 \\
@@ -77,11 +77,11 @@ Standard maximum likelihood estimation solutions tend to overfit. This over fitt
 \\
 & ||\theta||^2_2 = \sum_{j=1}^d \theta_j^2 \nonumber
 \end{align}
-Where $\mu$ is the regularization parameter that controls the tradeoff between maximizing J and minimizing the parameter values. $d$ is the length of the parameter vector $\theta_j$ \cite{Elkan2013}. Note that with regularization, our estimate is a \emph{maximum a posteriori} estimation using a Gaussian prior with mean 0 and variance $\sqrt{\frac{1}{2\mu}}$.
+Where $\mu$ is the regularization parameter that controls the tradeoff between maximizing J and minimizing the parameter values and $d$ is the length of the parameter vector $\theta_j$ \cite{Elkan2013}. Note that with regularization, our estimate is a \emph{maximum a posteriori} estimation using a Gaussian prior with mean 0 and variance $\sqrt{\frac{1}{2\mu}}$.
 
 \subsubsection{Similarity to Logistic Regression}
 \paragraph{}
-The HLBL model is actually similar to logistic regression. We can think of HLBL as logistic regression with knowledge of context words. 
+The HLBL model is actually similar to \emph{logistic regression}. We can think of HLBL as logistic regression with knowledge of context words. 
 The standard logistic regression model looks like:
 \begin{align}
 P(y =1 | x; \alpha, \beta) = \sigma \left( \sum_{j=1}^d \beta_j x_j + \alpha \right)
@@ -94,7 +94,7 @@ We can then compare it against the HLBL model:
 \begin{align}
 P(d_j(w_i) = 1 | q_j, w_{i-(n-1)},\dots, w_{i-1}) =  \sigma( (\sum_i C_i r_{w_i})^T q_{j} +b_{j})
 \end{align}
-We see that most of the two models are the same, the main difference being the addition of the $C_i$ matrices.  The $C_i$ matrices hold parameters that deal with the interactions between context words and nodes in the tree. $q_j$ also plays a different role. In the logistic regression model, $q_j$ is a weight for word $w_j$, whereas in the HLBL model, $q_j$ is a vector representation for a node in the tree. Still, the models are similar and we can think of HLBL as logistic regression for nodes in the tree, weighted by context prediction vectors.
+We see that most of the two models are the same, the main difference being the addition of the $C_i$ matrices.  The $C_i$ matrices hold parameters that deal with the interactions between context words and nodes in the tree. The $q_j$ term also plays a different role. In the logistic regression model, $q_j$ is a weight for word $w_j$, whereas in the HLBL model, $q_j$ is a vector representation for a node in the tree. Still, the models are similar and we can think of HLBL as logistic regression for nodes in the tree, weighted by context prediction vectors.
 
 
 \subsection{Model training}
@@ -125,8 +125,7 @@ Here are the gradients after every decision $d_j(w_i)$:
 \\
 P \left(d_j(w_i) = 1 | h \right)= & P \left(d_j(w_i) = 1 | q_j, w_{i-(n-1)},\dots, w_{i-1} \right) \nonumber
 \end{align}
-
-$q_j$ and $b_j$ should be updated per decision but $r_{w_i}$ and $C_i$ should only be updated per word. Here are the word gradients:
+There terms $q_j$ and $b_j$ should be updated per decision but the terms $r_{w_i}$ and $C_i$ should only be updated per word. Here are the word gradients:
 \begin{align}
 & \nabla_{r_{w_i}} \left( -\ln(J(\theta;w_1,\dots, w_m)) +  \mu ||\theta||^2_2 \right)  =  C_i^T \sum_j \left( P \left(d_j(w_i) = 1 | h \right)  - d_j(w_i) \right)q_j +2\mu r_{w_i} \nonumber
 \\
@@ -143,7 +142,7 @@ A stochastic gradient descent update looks like:
 \end{align}
 \subsubsection{Mini-batches}
 \paragraph{}
-A compromise between gradient descent and stochastic gradient descent is to use \emph{mini-batches}. Instead of updating parameters after each example like stochastic gradient descent, or after all examples like gradient descent, one updates the parameters after a mini-batch of examples. A \emph{mini-batch} is a small selection of examples. The size of a mini-batch is typically a small percentage of the total parameters: on the order of a few hundred or thousand depending on how many total parameters there are.
+A compromise between gradient descent and stochastic gradient descent is to use \emph{mini-batches}. Instead of updating parameters after each example like stochastic gradient descent, or after all examples like gradient descent, one updates the parameters after a mini-batch of examples. A \emph{mini-batch} is a small selection of examples. The size of a mini-batch is typically a small percentage of the total parameters, on the order of a few hundred or thousand depending on how many total parameters there are.
 \paragraph{}
 A single step of stochastic gradient descent using mini-batches looks like:
 \begin{align}
@@ -232,10 +231,10 @@ Huffman encoding takes on the order of $O\left(|V| \log |V| \right)$ calculation
 
 \subsection{Brown Clustering Trees}
 \paragraph{}
-\emph{Brown clustering} clusters words into classes and is a bottom-up agglomerative technique that starts off with each word in its own class, and then successively merges the classes based on some criteria. For my purposes, I will merge classes until there is only a single class left.  Brown clustering is introduced by Peter Brown et al. in \cite{Brown1992}.
-Brown clusters try to maximize the average mutual information of adjacent classes.
+\emph{Brown Clustering} clusters words into classes and is a bottom-up agglomerative technique that starts off with each word in its own class, and then successively merges the classes based on some criteria. For my purposes, I will merge classes until there is only a single class left.  Brown Clustering is introduced by Peter Brown et al. in \cite{Brown1992}.
+Brown Clusters try to maximize the average mutual information of adjacent classes.
 \paragraph{}
-I am interested in using Brown clustering because, by maximizing the average mutual information of adjacent classes, Brown clusters tend to cluster words that co-occur together. Words that co-occur are often semantically similar words. Hopefully this means decisions in the Brown clustering tree will take into account semantic differences or at least co-occurence information. This deals with the major shortfall of Huffman trees. Mnih and Hinton do consider Brown clustering trees in \cite{MnihHinton2009}, but dismiss it due to the fact that each word only belongs to a single class. 
+I am interested in using Brown Clustering because, by maximizing the average mutual information of adjacent classes, Brown Clusters tend to cluster words that co-occur together. Words that co-occur are often semantically similar words. Hopefully this means decisions in the Brown Clustering tree will take into account semantic differences or at least co-occurence information. This deals with the major shortfall of Huffman trees. Mnih and Hinton do consider Brown Clustering trees in \cite{MnihHinton2009}, but dismiss it due to the fact that each word only belongs to a single class. 
 \paragraph{}
 The average mutual information of adjacent classes I is defined as:
 \begin{align}
@@ -255,9 +254,9 @@ can be made larger by moving some words from one class to another. Therefore, af
 having derived a set of classes from successive merges, we cycle through the vocabulary moving each word to the class for which the resulting partition has the greatest 
 average mutual information. Eventually no potential reassignment of a word leads to 
 a partition with greater average mutual information. At this point, we stop" \cite[pg. 472]{Brown1992}.  
-Note that Brown clustering results in each word belonging to a single cluster. Also, Brown clusters with a mutual information criteria tend to put together words that are semantically similar.
+Note that Brown Clustering results in each word belonging to a single cluster. Also, Brown Clusters with a mutual information criteria tend to put together words that are semantically similar.
 \paragraph{}
-This algorithm can be improved upon, as Percy Liang demonstrates in \cite{Liang2005}. The new algorithm is similar except that in the beginning only the top $m$ most frequent words are put into their own clusters. The next words are then merged into one of the $m$ clusters based on a similarity metric. Once all the words are in one of the $m$ clusters, the $m$ clusters are merged based on~the same similarity metric.
+This algorithm can be improved upon, as Percy Liang demonstrates in \cite{Liang2005}. The new algorithm is similar except that in the beginning only the top $m$ most frequent words are put into their own clusters. The next words are then merged into one of the $m$ clusters based on a similarity metric. Once all the words are in one of the $m$ clusters, the $m$ clusters are merged based on~the similarity metric.
 The similarity metric used by Liang is:
 \begin{align}
 Quality(C) = \sum_{c,c'} I(c,c') - H
@@ -266,7 +265,7 @@ H= -\sum_w P(w) \log P(w) \nonumber
 \end{align}
 where H is the entropy and $\sum_{c,c'} I(c,c')$ is the average mutual information over all classes.
 \paragraph{}
-The binary tree for Brown clustering is created the same way as it is for Huffman coding. Each word is represented using a leaf node. A new decision node is created upon each merge. The code for every word is then the decisions taken from the root to the word.
+The binary tree for Brown Clustering is created the same way as it is for Huffman coding. Each word is represented using a leaf node. A new decision node is created upon each merge. The code for every word is then the decisions taken from the root to the word.
 
 \subsubsection{Brown-Liang Clustering Pseudo-code}
 The pseudo-code is outlined in \cite{Collins2011}.
@@ -290,11 +289,11 @@ merge two clusters $c_a$ and $c_b$ such that Quality(C) is maximized
 
 \subsubsection{Creation Complexity}
 \paragraph{}
-Calculation of the original Brown clusters takes $O(|V|^5)$ calculations and Brown-Liang clusters requires $O(|V| m^2+n|)$ calculations where $m$ is the number of initial clusters and $n$ is the corpus length.  
+Calculation of the original Brown Clusters takes $O(|V|^5)$ calculations and Brown-Liang clusters requires $O(|V| m^2+n|)$ calculations where $m$ is the number of initial clusters and $n$ is the corpus length.  
 
 \subsection{Recursive ADAPTIVE Trees} \label{sec:recursiveADAPTIVETree}
 \paragraph{}
-Another tree introduced in \cite{MnihHinton2009} is the ADAPTIVE tree. The ADAPTIVE tree is also mentioned in Section \ref{sec:HLBL}. The ADAPTIVE tree is created top-down by clustering on learned prediction vectors. The clustering method is a mixture of two Gaussians. The clusters are created with respect to the most responsible Gaussian, which generally creates a non-balanced tree. The mixture of two Guassians is applied recursively until a full tree is formed. The real power behind this method comes from clustering on learned prediction vectors which are better than the unigram or co-occurance statistics that inform Huffman and Brown cluster trees. The ADAPTIVE tree creates decision nodes that separate dissimilar prediction vectors, and cluster similar prediction vectors. 
+Another tree introduced in \cite{MnihHinton2009} is the ADAPTIVE tree. The ADAPTIVE tree is also mentioned in Section \ref{sec:HLBL}. The ADAPTIVE tree is created top-down by clustering on learned prediction vectors. The clustering method is a mixture of two Gaussians. The clusters are created with respect to the most responsible Gaussian, which generally creates a non-balanced tree. The mixture of two Gaussians is applied recursively until a full tree is formed. The real power behind this method comes from clustering on learned prediction vectors which are better than the unigram or co-occurance statistics that inform Huffman and Brown cluster trees. The ADAPTIVE tree creates decision nodes that separate dissimilar prediction vectors, and cluster together similar prediction vectors. 
 
 \paragraph{}
 Mnih and Hinton use learned prediction vectors from the HLBL model with a random tree. I~think starting off with a better tree such as a Huffman tree or a Brown Cluster tree for the initial HLBL model can improve the ADAPTIVE tree performance. Additionally, I think recursively training the ADAPTIVE tree, on the results from the HLBL model with an ADAPTIVE tree could be fruitful. This would result in the Recursive ADAPTIVE tree which actually has two levels of recursion. This first level of recursion comes from running the ADAPTIVE algorithm multiple times. The second level of recursion comes from running the mixture of Gaussians multiple times within the ADAPTIVE algorithm.  On the first level of recursion, by recursively adapting the tree, the tree can better capture the learned word representations, which results in better learned word representations. 

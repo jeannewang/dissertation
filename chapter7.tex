@@ -3,7 +3,7 @@
 
 \section{Concluding Remarks}
 \paragraph{}
-This dissertation explored novel trees with the HLBL model in order to find a tree that was fast to train, test and create while performing reasonably well. The HLBL model with a Huffman tree was found to be fast to train, test and create at the cost of lower performance, and HLBL model with the Brown Cluster tree with word2vec $Q$ initialization was found to perform as well as the standard LBL model, though was slow to create. The best mixture of speed and performance came in the form of the HLBL model with an ADAPTIVE(word2vec) tree that also used word2vec $Q$ initialization. This new model is faster than Factored LBL model on datasets with large vocabulary with an acceptable amount of performance loss. Unfortunately, the performance loss increases with larger vocabularies, because the decision tree also becomes larger. This is a time-performance trade-off that should to be considered when using the model with larger data sets.
+This dissertation explored novel trees with the HLBL model in order to find a tree that was fast to train, test and create while performing reasonably well. The HLBL model with a Huffman tree was found to be fast to train, test and create at the cost of lower performance, and the HLBL model with a Brown Cluster tree and word2vec $Q$ initialization was found to perform as well as the standard LBL model, though was slow to create. The best mixture of speed and performance came in the form of the HLBL model with an ADAPTIVE(word2vec) tree that also used word2vec $Q$ initialization. This new model is faster than Factored LBL model on datasets with large vocabulary and has an acceptable amount of performance loss. Unfortunately, the performance loss increases with larger vocabularies, because the decision tree also becomes larger. This is a time-performance trade-off that should to be considered when using the model with sizable data sets. 
 
 \paragraph{}
 In this project, I only explored trees with a single code per word even though Mnih and Hinton found that trees with multiple codes per word can result in large gains in perplexity and speed \cite{MnihHinton2009}. I think this project could have been more successful by also exploring multi-code trees.
@@ -16,13 +16,13 @@ For the hierarchical method to be truly useful, it must be applied to other neur
 A number of improvements to the model described in this dissertation should be considered in future work.
 These improvements include: using conditional node probabilities, adding interactions between the $C$ matrices, combining class-based and hierarchical models and using overcomplete trees.
  
-\subsection{Conditional probabilities of node decisions}
+\subsection{Conditional Probabilities of Node Decisions}
 \paragraph{}
 A simplifying assumption used in the HLBL model is that each decision is independent of others. This is not true though, and instead of using the assumption, we can calculate the conditional probability of each decision given previous decisions. The probability of a word then becomes:
 \begin{align}
 P(w_i | w_{i-(n-1)},\dots, w_{i-1})  = \prod_j P(b_j(w_i) | q_j, w_{i-(n-1)},\dots, w_{i-1}, b_1(w_i), \dots, b_{j-1}(w_i))
 \end{align}
-By removing this assumption, the decision probabilities become more accurate, and hopefully will improve the model's performance.
+By removing this assumption, the decision probabilities become more accurate, and hopefully improves the model's performance.
 
 \subsection{Interactions between $C$}
 \paragraph{}
@@ -30,7 +30,7 @@ Each of the context matrices $C_i$ is weighted identically. In a real sentence t
 
 \subsection{Mixture of Class-based and Hierarchical model}
 \paragraph{}
-Another idea is to separate words into classes such as in a class-based model, and to apply a HLBL model to each class. This means creating a separate tree per class, where the trees can all be the same, or be different depending on the type of class. The combination of a class-based and hierarchical model should experience a speed-up and a benefit in performance. The initial class decision removes $\log(c)$ levels, where c is the number of classes, from the binary tree, so the average number of binary decisions will decrease. Additionally, the initial class decision, forces the model to have some sort of clustering. If the initial classes are semantically or lexically based, this could lead to performance improvements. This may be of particular benefit when using Huffman trees as the class tree.
+Another idea is to separate words into classes such as in a class-based model, and to apply a HLBL model to each class. This means creating a separate tree per class, where the trees can all be the same, or be different depending on the type of class. The combination of a class-based and hierarchical model should experience a speed-up and a benefit in performance. The initial class decision removes $\log(c)$ levels, where c is the number of classes, from the binary tree, so the average number of binary decisions will decrease. Additionally, the initial class decision forces the model to have some sort of clustering. If the initial classes are semantically or lexically based, this could lead to performance improvements. This may be of particular benefit when using Huffman trees as the class tree.
 
 
 \subsection{Overcomplete Trees}
@@ -39,7 +39,7 @@ Another type of tree that should be explored further is the overcomplete tree in
 \paragraph{}
 Overcomplete trees are a good idea because they allow the HLBL model to take advantage of multiple representations for each word. It may be that certain words should have multiple representations such as polysemous words, or it could be that certain trees are better for representing a word. By using overcomplete trees, the HLBL model is allowed the freedom to choose between the varying code representations while only adding $\log_2(F)$ more levels to the tree. The creation complexity of overcomplete trees is simply the summation of the creation complexities of each subtree.
 \paragraph{}
-In \cite{MnihHinton2009}, only overcomplete trees with $ADAPTIVE(\epsilon)$ subtrees are used. I would like to see how using other types of subtrees can affect the performance of overcomplete trees. While many combinations are possible, I believe looking at random and random overcomplete trees, random and Huffman overcomplete trees, Huffman and Brown cluster overcomplete trees, and also Huffman and reduced Huffman overcomplete trees are good places to start.
+In \cite{MnihHinton2009}, only overcomplete trees with $ADAPTIVE(\epsilon)$ subtrees are used. I would like to see how using other types of subtrees can affect the performance of overcomplete trees. While many combinations are possible, I believe looking at random and random overcomplete trees, random and Huffman overcomplete trees, Huffman and Brown Cluster overcomplete trees, and also Huffman and reduced Huffman overcomplete trees are good places to start.
 \paragraph{}
-My idea for a reduced Huffman tree is to create a tree of infrequent words. Since the Huffman tree already orders words by frequency, if I simply cut the tree at some depth $d$, all nodes below depth $d$ should contain words that are infrequent, with larger $d$ being more infrequent words. After cutting the tree, the nodes can be reformed into a tree using the normal Huffman code algorithm. Using reduced Huffman trees in overcomplete trees will give less frequent words more code representations, and hopefully will result in better accuracy for less frequent words. This is important because infrequent words are the words language models have the most difficulty with.
+My idea for a reduced Huffman tree is to create a tree of infrequent words. Since the Huffman tree already orders words by frequency, if I simply cut the tree at some depth $d$, all nodes below depth $d$ should contain words that are infrequent, with larger $d$ being more infrequent words. After cutting the tree, the nodes can be reformed into a tree using the normal Huffman code algorithm. Using reduced Huffman trees in overcomplete trees will give less frequent words more code representations, and hopefully will result in better accuracy for less frequent words. This is important because infrequent words are the words that language models have the most difficulty with.
 

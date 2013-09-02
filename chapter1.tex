@@ -16,7 +16,7 @@ One simple neural-based model with good performance is the log-bilinear model \c
 
 \section{Contributions}
 \paragraph{}
-In this dissertation, I explore the combination of three trees with the HLBL model: the Huffman tree, the Brown Cluster tree and the Recursive ADAPTIVE tree. These three trees have not been used before with the HLBL model. I find that the Brown Cluster tree is the best performing tree in terms of perplexity of the three, but is very slow to create. The Huffman tree on the other hand is fast to create, but does not perform very well in terms of perplexity. The Recursive ADAPTIVE tree is in the middle of the pack; it is relatively slow to create but has better performance than the Huffman tree. To improve the performance of the ADAPTIVE tree model, I use word2vec representations to initialize the context word representation parameters. This proves to be a good combination and results in a model that is both fast and accurate when applied to large corpora. The new model is $3.89\times$ faster than the factored log-bilinear model but is 1.93\% worse in terms of entropy.
+In this dissertation, I explore the combination of three trees with the hierarchical log-bilinear model: the Huffman tree, the Brown Cluster tree and the Recursive ADAPTIVE tree. These three trees have not been used before with the hierarchical log-bilinear model. I find that the Brown Cluster tree is the best performing tree in terms of perplexity of the three, but is very slow to create. The Huffman tree on the other hand is fast to create, but does not perform very well in terms of perplexity. The Recursive ADAPTIVE tree is in the middle of the pack; it is relatively slow to create but has better performance than the Huffman tree. To improve the performance of the ADAPTIVE tree model, I use word2vec representations to initialize the context word representation parameters. This proves to be a good combination and results in a model that is both fast and accurate when applied to large corpora. The new model is $3.89\times$ faster than the factored log-bilinear model but is 1.93\% worse in terms of entropy.
 
 \section{Outline}
 \paragraph{}
@@ -26,7 +26,7 @@ In Chapter 2 of this dissertation I will cover language models including the n-g
 In Chapter 3, I will cover speed-up techniques for language models and describe why I have decided to focus on using a hierarchical method. These speed-up techniques include class-based methods, hierarchical-based methods, gradient approximation methods, vocabulary truncation, diagonalizing context matrices, and also switching the training order.
 
 \paragraph{}
-In Chapter 4, I will explain my proposed method including the model definition and the tree definitions. The proposed model is the hierarchical log-bilinear model and the trees that will be explored are the Huffman tree, the Brown Cluster tree, and the Recursive ADAPTIVE tree.
+In Chapter 4, I will explain my proposed method including the model definition and the tree definitions. The proposed model is the hierarchical log-bilinear model and the trees explored are the Huffman tree, the Brown Cluster tree, and the Recursive ADAPTIVE tree.
 
 \paragraph{}
 In Chapter 5, I describe the engineering tasks and tips and tricks for implementing the model. These include model initialization, tree building, gradient checking and variable caching.
